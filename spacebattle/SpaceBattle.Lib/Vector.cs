@@ -16,9 +16,9 @@ public class Vector
         vectorsum.cordinates= vector1.cordinates.Select((p, ind) => p+vector2.cordinates[ind]).ToArray();
         return vectorsum;
     }
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
-        return cordinates.SequenceEqual( ( (Vector)obj ).cordinates);
+        return obj != null && cordinates.SequenceEqual( ( (Vector)obj ).cordinates);
     }
     public override int GetHashCode()
     {

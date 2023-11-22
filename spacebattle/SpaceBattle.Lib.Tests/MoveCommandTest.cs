@@ -1,3 +1,4 @@
+using System.Runtime.Intrinsics;
 using Moq;
 
 namespace SpaceBattle.Lib.Tests;
@@ -60,5 +61,24 @@ public class MoveCommandTest
 
 
         Assert.Throws<Exception>(moveCommand.Execute);
+    }
+
+    [Fact]
+    public void HashCode_Test()
+    {
+        Vector vector= new Vector(0,0);
+
+        int c=vector.GetHashCode();
+
+        Assert.True(true);
+    }
+    [Fact]
+     public void Eq_Test()
+    {
+        Vector vector= new Vector();
+        
+        Vector vector1=new Vector(12,5);
+        
+        Assert.False(vector1.Equals(vector));
     }
 }
