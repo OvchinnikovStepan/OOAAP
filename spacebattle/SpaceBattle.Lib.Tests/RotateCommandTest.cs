@@ -51,7 +51,7 @@ public class RotateCommandTest
         movable.SetupGet(m => m.Position).Returns(new Rotate_Vector(360, 45)).Verifiable();
         movable.SetupGet(m => m.Velocity).Returns(new Rotate_Vector(360, 45)).Verifiable();
 
-        movable.SetupSet(m => m.Position).Throws(() => new Exception()).Verifiable();
+        movable.SetupSet(m => m.Position = It.IsAny<Rotate_Vector>()).Throws(new Exception()).Verifiable();
 
         ICommand moveCommand = new RotateCommand(movable.Object);
 
