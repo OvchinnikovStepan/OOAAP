@@ -36,7 +36,7 @@ public class RotateCommandTest
         rotatable.SetupGet(m => m.Position).Returns(new Rotate_Vector(360, 45)).Verifiable();
         rotatable.SetupGet(m => m.Velocity).Throws(new Exception()).Verifiable();
 
-        ICommand rotateCommand = new RotateCommand(movable.Object);
+        ICommand rotateCommand = new RotateCommand(rotatable.Object);
 
         Assert.Throws<Exception>(rotateCommand.Execute);
     }
@@ -50,7 +50,7 @@ public class RotateCommandTest
 
         rotatable.SetupSet(m => m.Position = It.IsAny<Rotate_Vector>()).Throws(new Exception()).Verifiable();
 
-        ICommand rotateCommand = new RotateCommand(movable.Object);
+        ICommand rotateCommand = new RotateCommand(rotatable.Object);
 
         Assert.Throws<Exception>(rotateCommand.Execute);
     }
@@ -59,7 +59,7 @@ public class RotateCommandTest
     {
         Rotate_Vector rotate_Vector = new Rotate_Vector(360, 0);
 
-        int hashCode = rotateVector.GetHashCode();
+        int hashCode = rotate_Vector.GetHashCode();
 
         Assert.True(true);
     }
