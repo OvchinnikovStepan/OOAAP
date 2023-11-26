@@ -16,9 +16,9 @@ public class Rotate_Vector
         Rotate_Vector vectorsum = new Rotate_Vector(vector1.number_of_positions, vector1.cordinates);
         return vectorsum;
     }
-    public override bool Equals(object? obj)
+    public override bool Equals(object obj)
     {
-        return obj != null && number_of_positions == ((Rotate_Vector)obj).number_of_positions && cordinates.SequenceEqual(((Rotate_Vector)obj).cordinates);
+        return number_of_positions == ((Rotate_Vector)obj).number_of_positions && cordinates.SequenceEqual(((Rotate_Vector)obj).cordinates);
     }
     public override int GetHashCode()
     {

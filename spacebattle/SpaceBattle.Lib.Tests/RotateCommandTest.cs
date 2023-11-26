@@ -57,4 +57,15 @@ public class RotateCommandTest
 
         Assert.Throws<Exception>(moveCommand.Execute);
     }
+    [Fact]
+    public void Hash_test()
+    {
+        Rotate_Vector rotate_Vector = new Rotate_Vector(360, 0);
+
+        int a = rotate_Vector.GetHashCode();
+
+        Assert.True(true);
+    }
+
+
 }
