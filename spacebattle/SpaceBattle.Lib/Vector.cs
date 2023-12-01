@@ -2,26 +2,26 @@ namespace  SpaceBattle.Lib;
 
 public class Vector
 {
-    private int cordinates_count;
-    private int[] cordinates;
+    private int CordinatesCount;
+    private int[] Cordinates;
     public Vector (params int[] cordinates)
     {
-        this.cordinates=cordinates;
-        cordinates_count=cordinates.Length;
+        this.Cordinates=cordinates;
+        CordinatesCount=cordinates.Length;
     }
 
     public static Vector operator +(Vector vector1,Vector vector2)
     {
-        Vector vectorsum = new Vector(new int[vector1.cordinates_count]);
-        vectorsum.cordinates= vector1.cordinates.Select((p, ind) => p+vector2.cordinates[ind]).ToArray();
-        return vectorsum;
+        Vector sum_vector = new Vector(new int[vector1.CordinatesCount]);
+        sum_vector.Cordinates= vector1.Cordinates.Select((p, ind) => p+vector2.Cordinates[ind]).ToArray();
+        return sum_vector;
     }
     public override bool Equals(object? obj)
     {
-        return obj != null && cordinates.SequenceEqual( ( (Vector)obj ).cordinates);
+        return obj != null && Cordinates.SequenceEqual( ( (Vector)obj ).Cordinates);
     }
     public override int GetHashCode()
     {
-        return cordinates.GetHashCode();
+        return Cordinates.GetHashCode();
     }
 }

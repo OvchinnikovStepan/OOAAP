@@ -6,7 +6,7 @@ namespace SpaceBattle.Lib.Tests;
 public class MoveCommandTest
 {
     [Fact]
-    public void Object_moved_succesfuly()
+    public void MoveCommand_Checking_That_Object_Moves_Succesfuly()
     {
         var movable = new Mock<IMovable>();
 
@@ -22,7 +22,7 @@ public class MoveCommandTest
     }
 
     [Fact]
-    public void Attemt_to_move_without_position_failed()
+    public void MoveCommand_Checking_That_Attempt_To_Move_Object_Without_Position_Throws_An_Error()
     {
         var movable = new Mock<IMovable>();
 
@@ -35,7 +35,7 @@ public class MoveCommandTest
     }
 
     [Fact]
-    public void Attemt_to_move_without_velocity_failed()
+    public void MoveCommand_Checking_That_Attempt_To_Move_Object_Without_Velocity_Throws_An_Error()
     {
         var movable = new Mock<IMovable>();
 
@@ -48,14 +48,14 @@ public class MoveCommandTest
     }
 
     [Fact]
-    public void Attemt_to_move_immoveble_object_failed()
+    public void MoveCommand_Checking_That_Attempt_To_Move_Immovable_Object_Throws_An_Error()
     {
         var movable=new Mock<IMovable>();
 
         movable.SetupGet(m => m.Position).Returns(new Vector  (12, 5)).Verifiable();
         movable.SetupGet(m => m.Velocity).Returns(new Vector  (-5, 3)).Verifiable();
 
-        movable.SetupSet(m=> m.Position).Throws(() => new Exception()).Verifiable();
+        movable.SetupSet(m=> m.Position=It.IsAny<Vector>()).Throws(() => new Exception()).Verifiable();
 
         ICommand moveCommand = new MoveCommand(movable.Object);
 
@@ -64,7 +64,7 @@ public class MoveCommandTest
     }
 
     [Fact]
-    public void HashCode_Test()
+    public void MoveCommand_Checking_That_Overrided_GetHashCode_Method_Works_Succesfully()
     {
         Vector vector= new Vector(0,0);
 
@@ -73,7 +73,7 @@ public class MoveCommandTest
         Assert.True(true);
     }
     [Fact]
-     public void Eq_Test()
+     public void MoveCommand_Checking_That_Attempt_To_Compare_Null_Vector_Does_Not_Throw_An_Error()
     {
         Vector vector= new Vector();
         
