@@ -1,20 +1,22 @@
 using Hwdtech;
 
-namespace SpaceBattle.Lib;
+namespace SpaceBattle.Lib
+{
+    public class StopCommand : ICommand
+    {
+        private IStopCommand stop_table;
 
-public class StartCommand : ICommand
-{
-private IStopCommand starttable;
+        public StopCommand(IStopCommand stop_table)
+        {
+            this.stop_table = stop_table;
+        }
 
-public StartCommand(IStopCommand starttable)
-{
-this.starttable = starttable;
-}
-public void Execute()
-{
-starttable.Property.ToList().ForEach(a => IoC.Resolve<ICommand>("Game.Property.Set", starttable.Target, a.Key, a.Value).Execute());
-var cmd = IoC.Resolve<ICommand>("Game.Operations.Movement", starttable.Target);
-IoC.Resolve<ICommand>("IUObject.Property.Set", starttable.Target, "Movement", cmd).Execute();
-IoC.Resolve<IQueue>("Game.Queue.Push").Add(cmd);
-}
+        public void Execute()
+        {
+            stop_table.Properties.ToList().ForEach(prop => IoC.Resolve<ICommand>("Game.Property.Set", stop_table.Target, prop.Key, prop.Value).Execute());
+            var movementCommand = IoC.Resolve<ICommand>("Game.Operations.Movement", stop_table.Target);
+            IoC.Resolve<ICommand>("IUObject.Property.Set", stop_table.Target, "Movement", movementCommand).Execute();
+            IoC.Resolve<IQueue>("Game.Queue.Push").Add(movementCommand);
+        }
+    }
 }
