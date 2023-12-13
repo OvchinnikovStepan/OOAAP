@@ -4,7 +4,6 @@ namespace SpaceBattle.Lib
     {
         public IUObject Target { get; }
         public IDictionary<string, object>
-        Properties
-        { get; }
+        Properties { get; }
     }
 }

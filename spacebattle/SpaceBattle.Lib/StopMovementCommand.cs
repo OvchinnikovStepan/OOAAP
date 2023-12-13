@@ -2,21 +2,38 @@ using Hwdtech;
 
 namespace SpaceBattle.Lib
 {
-    public class StopCommand : ICommand
+
+    public class StopCommand : ICommand, IStopCommand
     {
-        private IStopCommand stop_table;
+        private IUObject target;
+        private IDictionary<string, object> properties;
 
-        public StopCommand(IStopCommand stop_table)
+        public StopCommand(IUObject target, IDictionary<string, object> properties)
         {
-            this.stop_table = stop_table;
+            this.target = target;
+            this.properties = properties;
         }
-
         public void Execute()
         {
-            stop_table.Properties.ToList().ForEach(prop => IoC.Resolve<ICommand>("Game.Property.Set", stop_table.Target, prop.Key, prop.Value).Execute());
-            var movementCommand = IoC.Resolve<ICommand>("Game.Operations.Movement", stop_table.Target);
-            IoC.Resolve<ICommand>("IUObject.Property.Set", stop_table.Target, "Movement", movementCommand).Execute();
-            IoC.Resolve<IQueue>("Game.Queue.Push").Add(movementCommand);
+            if (target != null && properties != null)
+            {
+                target.SetProperty("IsMoving", false);
+                foreach (var property in properties)
+                {
+                    target.SetProperty(property.Key, property.Value);
+                }
+            }
         }
     }
-}
+
+    public IUObject Target
+    {
+        get  return target;
+        }
+
+    public IDictionary<string, object> Properties
+    {
+        get  return properties;
+        }
+    }
+    
