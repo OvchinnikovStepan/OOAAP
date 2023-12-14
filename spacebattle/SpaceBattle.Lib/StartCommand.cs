@@ -18,7 +18,7 @@ public class StartCommand : ICommand
     {
         starting.Properties.ToList().ForEach(prop => IoC.Resolve<object>("Game.IUObject.SetProperty",
         starting.Target,prop.Key,prop.Value));
-        
+
         var cmd = IoC.Resolve<ICommand>("Game.Commands.LongOperation",starting.Target);
         IoC.Resolve<object>("Game.IUObject.SetProperty",starting.Target,"Game.Commands.LongOperation",cmd);
         IoC.Resolve<IQueue>("Game.Queue").Add(cmd);
