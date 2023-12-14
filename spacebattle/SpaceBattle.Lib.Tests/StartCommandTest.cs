@@ -62,7 +62,7 @@ public class StartCommand_Tests
         var target = new Mock<IUObject>();
         var targetProperties = new Dictionary<string, object>();
 
-        var properties = new Dictionary<string, object> {{ "Position", new Vector(0,1,2,3,4,5) },};
+        var properties = new Dictionary<string, object> {{ "Position", new Vector(0,1,2,3,4,5) }};
 
         startcmd.SetupGet(s => s.Properties).Returns(properties).Verifiable();
         startcmd.SetupGet(s => s.Target).Returns(target.Object).Verifiable();
@@ -111,11 +111,26 @@ public class StartCommand_Tests
     {
         var startcmd = new Mock<IStartCommand>();
         startcmd.SetupGet(s => s.Target).Throws(new Exception()).Verifiable();
-        var properties = new Dictionary<string, object> {{ "Position", new Vector(5,4,3,2,1,0) },};
+        var properties = new Dictionary<string, object> {{ "Position", new Vector(5,4,3,2,1,0) }};
 
         startcmd.SetupGet(s => s.Properties).Returns(properties).Verifiable();
         var startCommand = new StartCommand(startcmd.Object);
 
         Assert.Throws<Exception>(startCommand.Execute);
+    }
+    [Fact]
+    public void IUObject_Test()
+    {
+      var target=new Mock<IUObject>();
+      var targetProperties = new Dictionary<string, object>();
+      target.Setup(t => t.setProperty(It.IsAny<string>(), It.IsAny<object>())).Callback<string, object>(targetProperties.Add).Verifiable();
+    
+      target.Object.setProperty("key","value");
+
+      target.Setup(t => t.getProperty(It.IsAny<string>())).Returns(targetProperties["key"]).Verifiable();
+      
+      var value=target.Object.getProperty("key");
+      
+      Assert.Equal(targetProperties["key"],value);
     }
 }
