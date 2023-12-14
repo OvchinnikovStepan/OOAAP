@@ -9,33 +9,18 @@ public interface IStartCommand{
 
 public class StartCommand : ICommand
 {
-    private readonly IStartCommand _startable;
-    public StartCommand(IStartCommand startable)
+    private readonly IStartCommand starting;
+    public StartCommand(IStartCommand starting)
     {
-        _startable = startable;
+        this.starting = starting;
     }
-
     public void Execute()
     {
-        _startable.Properties.ToList().ForEach(property => IoC.Resolve<object>(
-            "Game.IUObject.SetProperty",
-            _startable.Target,
-            property.Key,
-            property.Value
-        ));
-
-        var cmd = IoC.Resolve<ICommand>(
-            "Game.Commands.LongMove",
-            _startable.Target
-        );
-
-        IoC.Resolve<object>(
-            "Game.IUObject.SetProperty",
-            _startable.Target,
-            "Game.Commands.LongMove",
-            cmd
-        );
-
+        starting.Properties.ToList().ForEach(prop => IoC.Resolve<object>("Game.IUObject.SetProperty",
+        starting.Target,prop.Key,prop.Value));
+        
+        var cmd = IoC.Resolve<ICommand>("Game.Commands.LongOperation",starting.Target);
+        IoC.Resolve<object>("Game.IUObject.SetProperty",starting.Target,"Game.Commands.LongOperation",cmd);
         IoC.Resolve<IQueue>("Game.Queue").Add(cmd);
     }
 }
