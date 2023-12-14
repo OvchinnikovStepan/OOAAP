@@ -5,7 +5,7 @@ namespace SpaceBattle.Lib;
 
 public interface CollisionArraysFromFileReader
 {
-    public List<int[]> ReadFile();
+    public List<List<int>> ReadFile();
 }
 
 public class BuildCollisionTreeCommand: ICommand
