@@ -38,10 +38,10 @@ namespace SpaceBattle.Lib.Tests
             var keys = new List<string>() { "Movement" };
             var characteristics = new Dictionary<string, object>();
 
-            target.Setup(t => t.SetProperty(It.IsAny<string>(), It.IsAny<object>())).Callback<string, object>((key, value) => characteristics.Add(key, value));
+            target.Setup(t => t.setProperty(It.IsAny<string>(), It.IsAny<object>())).Callback<string, object>((key, value) => characteristics.Add(key, value));
             target.Setup(t => t.DeleteProperty(It.IsAny<string>())).Callback<string>((string key) => characteristics.Remove(key));
-            target.Setup(t => t.GetProperty(It.IsAny<string>())).Returns((string key) => characteristics[key]);
-            target.Object.SetProperty("Movement", 1);
+            target.Setup(t => t.getProperty(It.IsAny<string>())).Returns((string key) => characteristics[key]);
+            target.Object.setProperty("Movement", 1);
 
             mockEndable.SetupGet(e => e.command).Returns(injectCommand);
             mockEndable.SetupGet(e => e.target).Returns(target.Object);
@@ -50,7 +50,7 @@ namespace SpaceBattle.Lib.Tests
             var endmovementcommand = new EndMovementCommand(mockEndable.Object);
             endmovementcommand.Execute();
 
-            Assert.Throws<System.Collections.Generic.KeyNotFoundException>(() => target.Object.GetProperty("Movement"));
+            Assert.Throws<System.Collections.Generic.KeyNotFoundException>(() => target.Object.getProperty("Movement"));
         }
 
         [Fact]
