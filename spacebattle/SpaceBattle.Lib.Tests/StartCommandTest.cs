@@ -20,10 +20,13 @@ public class StartCommand_Tests
                 return new object();
             }
             ).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register","Commands.Injectable",(object[] args)=>{return args[0];}).Execute();
 
         var LongMoveCommand = new Mock<ICommand>().Object;
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register","Game.Commands.LongOperation",
         (object[] args) => {return LongMoveCommand;}).Execute();
+
+        
     }
    [Fact]
     public void IUObject_Methods_Work_Correctly()
