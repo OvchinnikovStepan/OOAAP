@@ -49,4 +49,14 @@ public class BuildCollisionTreeTest
         Assert.True(level5Derived.SequenceEqual(level5Expected));
         Assert.Empty(((Node)((Node)((Node)((Node)collisionTree[1])[2])[3])[5]).Keys);
     }
+     [Fact]
+    public void BuildCollisionTreeCommand_Disability_To_Read_File_Causes_Exeption()
+    {
+        var reader = new Mock<CollisionArraysFromFileReader>();
+        reader.Setup(r => r.ReadFile()).Throws(new Exception());
+
+        var collisionTreeCommand = new BuildCollisionTreeCommand(reader.Object);
+
+        Assert.Throws<Exception>(collisionTreeCommand.Execute);
+    }
 }
