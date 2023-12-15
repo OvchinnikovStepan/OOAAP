@@ -30,4 +30,17 @@ public class MacroCommandTests
             firstSubCommand.Verify(mc => mc.Execute(), Times.Once());
             secondSubCommand.Verify(cfc => cfc.Execute(), Times.Once());
         }
+        [Fact]
+        public void MacroCommand_Disability_To_Execute_SubCommand_Caueses_Exeption()
+        {
+            var firstSubCommand=new Mock<ICommand>();
+            var secondSubCommand=new Mock<ICommand>();
+            IoC.Resolve<Hwdtech.ICommand>("IoC.Register","FirstSubCommand",(object[] args)=>{return firstSubCommand.Object;}).Execute();
+            IoC.Resolve<Hwdtech.ICommand>("IoC.Register","SecondSubCommand",(object[] args)=>{return secondSubCommand.Object;}).Execute();
+            firstSubCommand.Setup(f=>f.Execute()).Throws(new Exception()).Verifiable();
+
+            var macroCommand=new MacroCommand("Command.MacroCommand.SomeMacroCommand");
+
+            Assert.Throws<Exception>(macroCommand.Execute);
+        }
     }
