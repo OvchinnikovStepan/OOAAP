@@ -1,6 +1,6 @@
 namespace SpaceBattle.Lib;
 using Hwdtech;
-using N=System.Collections.Generic. Dictionary<int,Dictionary<int,Handler>>;
+using N=Dictionary<int,Dictionary<int,Handler>>;
 public interface Handler
     {
         object Run(params object[] args);
