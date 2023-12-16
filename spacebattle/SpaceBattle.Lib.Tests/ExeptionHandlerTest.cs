@@ -63,4 +63,12 @@ public class ExceptionHandlerTest
 
         Assert.Equal("No exeption found Handler", handler.Run());
         }
+
+        [Fact]
+        public void EmptyCommand_Execute_Test()
+        {
+            var emptyCommand = new EmptyCommand();
+            emptyCommand.Execute();
+            Assert.True(true);
+        }
     }
