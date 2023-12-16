@@ -39,7 +39,6 @@ namespace SpaceBattle.Lib.Tests
             mockCommand.Verify(command => command.Execute(), Times.Never());
         }
 
-
         [Fact]
         public void CheckCollision_Command_Should_Execute_Collision_Event_If_Collision_Occurs()
         {
