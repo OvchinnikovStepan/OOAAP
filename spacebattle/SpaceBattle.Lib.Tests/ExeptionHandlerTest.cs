@@ -20,16 +20,12 @@ public class ExceptionHandlerTest
         noCmdHandler.Setup(x => x.Run()).Returns("No command found Handler"); 
         noExpHandler.Setup(x => x.Run()).Returns("No exeption found Handler");
 
-        var exp = new Mock<Exception>();
-        var exphash=exp.GetType().GetHashCode();
-        var cmd = new Mock<ICommand>();
-        var cmdhash=cmd.GetType().GetHashCode();
-
-        var dict = new N { { cmdhash, new Dictionary<int, Handler>() { { exphash, handler.Object } } } };
+        var dict = new N() { { new Mock<ICommand>().Object.GetType().GetHashCode(), new Dictionary<int, Handler>()
+                 { { new Mock<Exception>().Object.GetType().GetHashCode(), handler.Object } } } };
 
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Exception.tree", (object[] args) =>{return dict;}).Execute();
 
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Exception.Get.NotFoundCommandSubTree", (object[] args) =>
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Exception.Get.NoCommandSubTree", (object[] args) =>
             { return new Dictionary<int, Handler>() { { new Mock<Exception>().Object.GetType().GetHashCode(),
                 noCmdHandler.Object } };}).Execute();
         
@@ -37,7 +33,34 @@ public class ExceptionHandlerTest
             { return noExpHandler.Object; }).Execute();
         }
 
-      
+        [Fact]
+         public void ExceptionHandler_Founds_Handler_Correctly()
+        {
+        var mockCommand = new Mock<SpaceBattle.Lib.ICommand>();
+        var mockException = new Mock<System.Exception>();
 
+        var strategy = (Handler)new ExceptionHandler().Run(mockCommand.Object, mockException.Object);
+        Assert.Equal("SomeHandler", strategy.Run());
+        }
 
+        [Fact]
+         public void ExceptionHandler_No_Command_Found_Case_Correct()
+         {
+        var emptyCommand = new EmptyCommand();
+        var exception = new Mock<Exception>();
+
+        var handler = (Handler)new ExceptionHandler().Run(emptyCommand, exception.Object);
+
+        Assert.Equal("No command found Handler", handler.Run());
+        }
+        [Fact]
+        public void ExceptionHandler_No_Exception_Found_Case_Correct()
+        {
+        var mockCommand = new Mock<ICommand>();
+        var exception = new Exception();
+
+        var handler = (Handler)new ExceptionHandler().Run(mockCommand.Object, exception);
+
+        Assert.Equal("No exeption found Handler", handler.Run());
+        }
     }
