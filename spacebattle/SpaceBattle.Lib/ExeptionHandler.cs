@@ -13,7 +13,7 @@ public class ExceptionHandler : Handler
             var commandHash=command.GetType().GetHashCode();
             var exception = (Exception)args[1];
             var exceptionHash=exception.GetType().GetHashCode();
-            var tree = IoC.Resolve<N>("Exeption.tree");
+            var tree = IoC.Resolve<N>("Exception.tree");
 
             Dictionary<int, Handler>? subTree;
 

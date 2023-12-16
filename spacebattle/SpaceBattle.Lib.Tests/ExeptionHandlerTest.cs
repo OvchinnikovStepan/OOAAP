@@ -27,13 +27,17 @@ public class ExceptionHandlerTest
 
         var dict = new N { { cmdhash, new Dictionary<int, Handler>() { { exphash, handler.Object } } } };
 
-        IoC.Resolve<ICommand>("IoC.Register", "Exeption.tree", (object[] args) =>{return dict;}).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Exception.tree", (object[] args) =>{return dict;}).Execute();
 
-        IoC.Resolve<ICommand>("IoC.Register", "Exception.Get.NotFoundCommandSubTree", (object[] args) =>
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Exception.Get.NotFoundCommandSubTree", (object[] args) =>
             { return new Dictionary<int, Handler>() { { new Mock<Exception>().Object.GetType().GetHashCode(),
                 noCmdHandler.Object } };}).Execute();
         
-        IoC.Resolve<ICommand>("IoC.Register", "Exception.Get.NoExcepetionHandler",(object[] args) => 
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Exception.Get.NoExcepetionHandler",(object[] args) => 
             { return noExpHandler.Object; }).Execute();
         }
+
+      
+
+
     }
