@@ -31,6 +31,23 @@ namespace SpaceBattle.Lib.Tests
             IoC.Resolve<ICommand>("Game.Operation." + name, mockUObject.Object).Execute();
             mockCommand.Verify();
         }
+        [Fact]
+        public void TestNegative()
+        {
+            var mockCommand = new Mock<ICommand>();
+            mockCommand.Setup(m => m.Execute());
 
+            var unactiveMockCommand = new Mock<ICommand>();
+            unactiveMockCommand.Setup(u => u.Execute()).Verifiable();
+
+            var name = "Fire";
+            var mockUObject = new Mock<IUObject>();
+
+            IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command." + name, (object[] args) => mockCommand.Object).Execute();
+            IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Operation." + name, (object[] args) => { return new LongOperationStrategy(name, (IUObject)args[0]).Run(); }).Execute();
+
+            IoC.Resolve<ICommand>("Game.Operation." + name, mockUObject.Object).Execute();
+            unactiveMockCommand.Verify(x => x.Execute(), Times.Never);
+        }
     }
 }
