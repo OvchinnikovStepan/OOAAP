@@ -46,9 +46,13 @@ namespace SpaceBattle.Lib.Tests
             mockEndable.SetupGet(e => e.command).Returns(injectCommand);
             mockEndable.SetupGet(e => e.target).Returns(target.Object);
             mockEndable.SetupGet(e => e.property).Returns(keys);
+            mockCommand.Setup(x=>x.Execute()). Verifiable ();
 
             var endmovementcommand = new EndMovementCommand(mockEndable.Object);
             endmovementcommand.Execute();
+            injectCommand.Execute();
+            mockCommand.Verify(m=> m.Execute(), Times.Never());
+
 
             Assert.Throws<System.Collections.Generic.KeyNotFoundException>(() => target.Object.getProperty("Movement"));
         }
