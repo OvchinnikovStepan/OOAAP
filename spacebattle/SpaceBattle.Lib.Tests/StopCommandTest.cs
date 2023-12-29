@@ -42,8 +42,9 @@ namespace SpaceBattle.Lib.Tests
             //var realQueue = new Queue<ICommand>();
 
             queue.Setup(q => q.Add(It.IsAny<ICommand>())).Verifiable();
+            mockCommand.Setup(x => x.Execute()).Callback(() => { queue.Object.Add(injectCommand); });
 
-            IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.Add", (object[] args) => { queue.Object.Add(injectCommand); }).Execute();
+            // IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.Add", (object[] args) =>{ queue.Object.Add((ICommand)args[0]);return 1;}).Execute();
 
             target.Setup(t => t.setProperty(It.IsAny<string>(), It.IsAny<object>())).Callback<string, object>((key, value) => characteristics.Add(key, value));
             target.Setup(t => t.DeleteProperty(It.IsAny<string>())).Callback<string>((string key) => characteristics.Remove(key));
@@ -62,30 +63,13 @@ namespace SpaceBattle.Lib.Tests
             var endmovementcommand = new EndMovementCommand(mockEndable.Object);
             injectCommand.Execute();
 
-            IoC.Resolve<Hwdtech.ICommand>("Game.Queue.Add");
 
-            queue.Verify(q => q.Add(mockCommand.Object), Times.Once());
+            queue.Verify(q => q.Add(injectCommand), Times.Once());
             endmovementcommand.Execute();
             injectCommand.Execute();
-            //var queueEx = queue.Object;
-            // IoC.Resolve("Game.Queue.Add", endmovementcommand);
-            // IoC.Resolve("Game.Queue.Add", injectCommand);
-            // IoC.Resolve("Game.Queue.Take", endmovementcommand);
-            // IoC.Resolve("Game.Queue.Take", injectCommand);
 
-            // realQueue.Enqueue(injectCommand);
-            // realQueue.Enqueue(endmovementcommand);
-            // realQueue.Enqueue(injectCommand);
+            queue.Verify(q => q.Add(injectCommand), Times.Once());
 
-            // queueEx.Add(endmovementcommand);
-            // queueEx.Add(injectCommand);
-            //Assert.NotEmpty(realQueue);
-            // queueEx.Take().Execute();
-            // queueEx.Take().Execute();
-            // queueEx.Take().Execute();
-            queue.Verify(q => q.Add(mockCommand.Object), Times.Once());
-            // mockCommand.Verify(m => m.Execute(), Times.Never());
-            //Assert.Empty(realQueue);
             Assert.Throws<System.Collections.Generic.KeyNotFoundException>(() => target.Object.getProperty("Movement"));
         }
 
