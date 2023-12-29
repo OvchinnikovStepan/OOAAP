@@ -1,7 +1,7 @@
 namespace SpaceBattle.Lib;
 using Hwdtech;
 
-public class InitCheckCollision : Icommand
+public class InitCheckCollision : ICommand
 {
     public void Execute()
     {

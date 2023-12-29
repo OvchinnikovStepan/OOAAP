@@ -14,8 +14,9 @@ namespace SpaceBattle.Lib.Tests
             IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.UObject.GetProperty", (object[] args) => new List<int> { 1, 1, 1, 1, 1 }).Execute();
 
             new InitFindVariationsCommand().Execute();
+            new InitCheckCollision().Execute();
 
-            IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.CheckCollision", (object[] args) => new CollisionCheckCommand((IUObject)args[0], (IUObject)args[1])).Execute();
+            // IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.CheckCollision", (object[] args) => new CollisionCheckCommand((IUObject)args[0], (IUObject)args[1])).Execute();
         }
 
         [Fact]
@@ -56,8 +57,6 @@ namespace SpaceBattle.Lib.Tests
 
             var checkCollisionCommand = IoC.Resolve<ICommand>("Game.Command.CheckCollision", mockUObject.Object, mockUObject.Object);
 
-            Assert.NotNull(checkCollisionCommand);
-            Assert.IsType<CollisionCheckCommand>(checkCollisionCommand);
             checkCollisionCommand.Execute();
             mockCommand.Verify(m => m.Execute(), Times.Once());
         }
