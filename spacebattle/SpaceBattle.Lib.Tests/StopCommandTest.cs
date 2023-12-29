@@ -39,12 +39,9 @@ namespace SpaceBattle.Lib.Tests
             var characteristics = new Dictionary<string, object>();
 
             var queue = new Mock<IQueue>();
-            //var realQueue = new Queue<ICommand>();
 
             queue.Setup(q => q.Add(It.IsAny<ICommand>())).Verifiable();
             mockCommand.Setup(x => x.Execute()).Callback(() => { queue.Object.Add(injectCommand); });
-
-            // IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.Add", (object[] args) =>{ queue.Object.Add((ICommand)args[0]);return 1;}).Execute();
 
             target.Setup(t => t.setProperty(It.IsAny<string>(), It.IsAny<object>())).Callback<string, object>((key, value) => characteristics.Add(key, value));
             target.Setup(t => t.DeleteProperty(It.IsAny<string>())).Callback<string>((string key) => characteristics.Remove(key));
@@ -54,22 +51,14 @@ namespace SpaceBattle.Lib.Tests
             mockEndable.SetupGet(e => e.command).Returns(injectCommand);
             mockEndable.SetupGet(e => e.target).Returns(target.Object);
             mockEndable.SetupGet(e => e.property).Returns(keys);
-            //mockCommand.Setup(x => x.Execute()).Callback().Verifiable();
-
-            //mockCommand.Setup(x => queue.Object.Add(mockCommand.Object));
-
-            //mockCommand.Setup(x => x.Execute()).Callback(() => { IoC.Resolve<object>("Game.Queue.Add"); });
 
             var endmovementcommand = new EndMovementCommand(mockEndable.Object);
+
             injectCommand.Execute();
-
-
             queue.Verify(q => q.Add(injectCommand), Times.Once());
             endmovementcommand.Execute();
             injectCommand.Execute();
-
             queue.Verify(q => q.Add(injectCommand), Times.Once());
-
             Assert.Throws<System.Collections.Generic.KeyNotFoundException>(() => target.Object.getProperty("Movement"));
         }
 
@@ -87,6 +76,7 @@ namespace SpaceBattle.Lib.Tests
 
             mockCommand.Verify(m => m.Execute(), Times.Never());
         }
+
         [Fact]
         public void EndMovementCommandDisabilityToDeletePropertiesCausesExeption()
         {
