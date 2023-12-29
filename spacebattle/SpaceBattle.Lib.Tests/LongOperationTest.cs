@@ -35,6 +35,9 @@ namespace SpaceBattle.Lib.Tests
                 }
             ).Execute();
 
+            var init = new InitLongOperationStrategy();
+            init.Execute();
+
         }
 
         [Fact]
@@ -83,9 +86,10 @@ namespace SpaceBattle.Lib.Tests
             IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.NewStartCommand", (object[] args) => new StartCommand((IStartCommand)args[0])).Execute();
             IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.Macro", (object[] args) => mockCommand.Object).Execute();
             IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Commands.Injectable", (object[] args) => new InjectCommand(mockCommand.Object)).Execute();
-            IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Operation." + name, (object[] args) => { return new LongOperationStrategy(name, (IUObject)args[0]).Run(); }).Execute();
+            var LOcmd = IoC.Resolve<ICommand>("Game.Commands.InitLO", name, mockUObject.Object);
+            IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Operation." + name, (object[] args) => { return LOcmd; }).Execute();
 
-            IoC.Resolve<ICommand>("Game.Operation." + name, mockUObject.Object).Execute();
+            IoC.Resolve<ICommand>("Game.Operation." + name).Execute();
 
             queue.Object.Take().Execute();
             mockCommand.Verify();
@@ -140,7 +144,8 @@ namespace SpaceBattle.Lib.Tests
             IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.NewStartCommand", (object[] args) => new StartCommand((IStartCommand)args[0])).Execute();
             IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.Macro", (object[] args) => mockCommand.Object).Execute();
             IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Commands.Injectable", (object[] args) => new InjectCommand(mockCommand.Object)).Execute();
-            IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Operation." + name, (object[] args) => { return new LongOperationStrategy(name, (IUObject)args[0]).Run(); }).Execute();
+            var LOcmd = IoC.Resolve<ICommand>("Game.Commands.InitLO", name, mockUObject.Object);
+            IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Operation." + name, (object[] args) => { return LOcmd; }).Execute();
 
             IoC.Resolve<ICommand>("Game.Operation." + name, mockUObject.Object).Execute();
 
