@@ -42,9 +42,8 @@ namespace SpaceBattle.Lib.Tests
             //var realQueue = new Queue<ICommand>();
 
             queue.Setup(q => q.Add(It.IsAny<ICommand>())).Verifiable();
-            //queue.Setup(q => q.Take()).Returns(() => realQueue.Dequeue());
+
             IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.Add", (object[] args) => { queue.Object.Add(injectCommand); }).Execute();
-            // IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.Take", (object[] args) => { queue.Take(); }).Execute();
 
             target.Setup(t => t.setProperty(It.IsAny<string>(), It.IsAny<object>())).Callback<string, object>((key, value) => characteristics.Add(key, value));
             target.Setup(t => t.DeleteProperty(It.IsAny<string>())).Callback<string>((string key) => characteristics.Remove(key));
@@ -58,10 +57,13 @@ namespace SpaceBattle.Lib.Tests
 
             //mockCommand.Setup(x => queue.Object.Add(mockCommand.Object));
 
-            mockCommand.Setup(x => x.Execute()).Callback(() => { IoC.Resolve<object>("Game.Queue.Add"); });
+            //mockCommand.Setup(x => x.Execute()).Callback(() => { IoC.Resolve<object>("Game.Queue.Add"); });
 
             var endmovementcommand = new EndMovementCommand(mockEndable.Object);
             injectCommand.Execute();
+
+            IoC.Resolve<Hwdtech.ICommand>("Game.Queue.Add");
+
             queue.Verify(q => q.Add(mockCommand.Object), Times.Once());
             endmovementcommand.Execute();
             injectCommand.Execute();
