@@ -35,9 +35,10 @@ namespace SpaceBattle.Lib.Tests
                 }
             ).Execute();
 
-            var init = new InitLongOperationStrategy();
-            init.Execute();
-
+            var initLO = new InitLongOperationStrategy();
+            initLO.Execute();
+            var initConvert = new InitConvertToStartable();
+            initConvert.Execute();
         }
 
         [Fact]
@@ -76,13 +77,6 @@ namespace SpaceBattle.Lib.Tests
             queue.Setup(q => q.Add(It.IsAny<ICommand>())).Callback(realQueue.Enqueue);
 
             IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command." + name, (object[] args) => mockCommand.Object).Execute();
-            IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.ConvertToStartable", (object[] args) =>
-            {
-                var emptyStartableObject = new Mock<IStartCommand>();
-                emptyStartableObject.Setup(x => x.Target).Returns((IUObject)args[0]);
-                emptyStartableObject.Setup(x => x.Properties).Returns(new Dictionary<string, object>());
-                return emptyStartableObject.Object;
-            }).Execute();
             IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.NewStartCommand", (object[] args) => new StartCommand((IStartCommand)args[0])).Execute();
             IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.Macro", (object[] args) => mockCommand.Object).Execute();
             IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Commands.Injectable", (object[] args) => new InjectCommand(mockCommand.Object)).Execute();
@@ -134,13 +128,6 @@ namespace SpaceBattle.Lib.Tests
             queue.Setup(q => q.Add(It.IsAny<ICommand>())).Callback(realQueue.Enqueue);
 
             IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command." + name, (object[] args) => mockCommand.Object).Execute();
-            IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.ConvertToStartable", (object[] args) =>
-            {
-                var emptyStartableObject = new Mock<IStartCommand>();
-                emptyStartableObject.Setup(x => x.Target).Returns((IUObject)args[0]);
-                emptyStartableObject.Setup(x => x.Properties).Returns(new Dictionary<string, object>());
-                return emptyStartableObject.Object;
-            }).Execute();
             IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.NewStartCommand", (object[] args) => new StartCommand((IStartCommand)args[0])).Execute();
             IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.Macro", (object[] args) => mockCommand.Object).Execute();
             IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Commands.Injectable", (object[] args) => new InjectCommand(mockCommand.Object)).Execute();
