@@ -1,6 +1,6 @@
 namespace SpaceBattle.Lib;
 
-public class EmptyCommand : ICommand
+public class EmptyCommand : Hwdtech.ICommand
 {
     public void Execute() { }
 }
