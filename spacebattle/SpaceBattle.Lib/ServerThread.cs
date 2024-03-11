@@ -1,14 +1,13 @@
 namespace SpaceBattle.Lib;
 
-
 using System.Collections.Concurrent;
 using Hwdtech;
-using Hwdtech.Ioc;
+
 public class ServerThread
 {
     private Action _behaviour;
-    private BlockingCollection<Hwdtech.ICommand> _queue;
-    private Thread _thread;
+    private readonly BlockingCollection<Hwdtech.ICommand> _queue;
+    private readonly Thread _thread;
     private bool _stop = false;
 
     public ServerThread(BlockingCollection<Hwdtech.ICommand> queue) {
@@ -16,7 +15,8 @@ public class ServerThread
 
         _behaviour = () => {
             var cmd = _queue.Take();
-            try {
+            try 
+            {
                 cmd.Execute();
             } catch(Exception e) {
                 IoC.Resolve<ICommand>("ExceptionHandler.Handle", cmd, e).Execute();
@@ -27,7 +27,8 @@ public class ServerThread
     }
 
     private void Loop() {
-        while(!_stop) {
+        while(!_stop)
+        {
             _behaviour();
         }
     }
@@ -48,5 +49,28 @@ public class ServerThread
     public void Start() 
     {
         _thread.Start();
+    }
+    public bool IsNotEmpty()
+    {
+        return Convert.ToBoolean(_queue.Count());
+    }
+    public override bool Equals(object? obj)
+    {
+        if (obj==null)
+        {
+            return false;
+        }
+
+        if (obj==_thread)
+        {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
     }
 } 
