@@ -60,7 +60,7 @@ public class StopServerTest
 
         IoC.Resolve<ICommand>("Game.Commands.StopServerCommand").Execute();
 
-        var testString = "Error occured\r\n";
+        var testString = "Error occured\n";
         Assert.Equal(File.ReadAllText(IoC.Resolve<string>("GetLogFilePath")), testString);
     }
 }
