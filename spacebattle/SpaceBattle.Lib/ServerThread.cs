@@ -61,9 +61,14 @@ public class ServerThread
             return false;
         }
 
-        if (obj==_thread)
+        if (obj.GetType()==typeof(Thread))
         {
-            return true;
+            return _thread == (Thread)obj;
+        }
+
+        if (GetType()!=obj.GetType())
+        {
+            return false;
         }
         
         return false;

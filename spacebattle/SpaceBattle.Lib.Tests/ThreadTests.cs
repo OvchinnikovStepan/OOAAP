@@ -99,12 +99,14 @@ public class ServerThreadTest_Exeption
         var _threadCollection=IoC.Resolve<Dictionary<int,ServerThread>>("GetThreadCollection");
 
         var hardStopCommand1 = IoC.Resolve<ICommand>("Server.Commands.HardStop", _threadCollection[1], ()=> {cmd.Object.Execute();});
-        var hardStopCommand2 = IoC.Resolve<ICommand>("Server.Commands.HardStop", _threadCollection[2], ()=> {cmd.Object.Execute();});
+        var hardStopCommand2 = IoC.Resolve<ICommand>("Server.Commands.HardStop", _threadCollection[2], ()=> {cmd.Object.Execute();mre.Set();});
 
         IoC.Resolve<Hwdtech.ICommand>("Server.Commands.SendCommand",1,hardStopCommand1).Execute();
+
+        IoC.Resolve<Hwdtech.ICommand>("Server.Commands.SendCommand",2,new ActionCommand(()=>{Thread.Sleep(1000);})).Execute();
         IoC.Resolve<Hwdtech.ICommand>("Server.Commands.SendCommand",2,hardStopCommand2).Execute();
 
-        Thread.Sleep(5000);
+        mre.WaitOne();
 
         startcmd.Verify(cmd=>cmd.Execute(),Times.Once());
         cmd.Verify(cmd=>cmd.Execute(),Times.Exactly(4));
