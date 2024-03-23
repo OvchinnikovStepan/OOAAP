@@ -1,4 +1,4 @@
-namespace SpaceBattle.Lib;
+﻿namespace SpaceBattle.Lib;
 
 using System.Collections.Concurrent;
 using Hwdtech;
@@ -10,15 +10,19 @@ public class ServerThread
     private readonly Thread _thread;
     private bool _stop = false;
 
-    public ServerThread(BlockingCollection<Hwdtech.ICommand> queue) {
+    public ServerThread(BlockingCollection<Hwdtech.ICommand> queue)
+    {
         _queue = queue;
 
-        _behaviour = () => {
+        _behaviour = () =>
+        {
             var cmd = _queue.Take();
-            try 
+            try
             {
                 cmd.Execute();
-            } catch(Exception e) {
+            }
+            catch (Exception e)
+            {
                 IoC.Resolve<ICommand>("ExceptionHandler.Handle", cmd, e).Execute();
             }
         };
@@ -26,14 +30,16 @@ public class ServerThread
         _thread = new Thread(Loop);
     }
 
-    private void Loop() {
-        while(!_stop)
+    private void Loop()
+    {
+        while (!_stop)
         {
             _behaviour();
         }
     }
 
-    internal void Stop() {
+    internal void Stop()
+    {
         _stop = !_stop;
     }
 
@@ -42,11 +48,12 @@ public class ServerThread
         return _behaviour;
     }
 
-    internal void SetBehaviour(Action newBehaviour) {
+    internal void SetBehaviour(Action newBehaviour)
+    {
         _behaviour = newBehaviour;
     }
 
-    public void Start() 
+    public void Start()
     {
         _thread.Start();
     }
@@ -56,26 +63,26 @@ public class ServerThread
     }
     public override bool Equals(object? obj)
     {
-        if (obj==null)
+        if (obj == null)
         {
             return false;
         }
 
-        if (obj.GetType()==typeof(Thread))
+        if (obj.GetType() == typeof(Thread))
         {
             return _thread == (Thread)obj;
         }
 
-        if (GetType()!=obj.GetType())
+        if (GetType() != obj.GetType())
         {
             return false;
         }
-        
+
         return false;
     }
-    
+
     public override int GetHashCode()
     {
         return base.GetHashCode();
     }
-} 
+}

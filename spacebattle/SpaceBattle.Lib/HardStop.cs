@@ -1,12 +1,15 @@
-namespace SpaceBattle.Lib;
+﻿namespace SpaceBattle.Lib;
 
-public class HardStopCommand: Hwdtech.ICommand {
+public class HardStopCommand : Hwdtech.ICommand
+{
     private readonly ServerThread _t;
-    public HardStopCommand(ServerThread t) {
+    public HardStopCommand(ServerThread t)
+    {
         _t = t;
     }
 
-    public void Execute() {
-             _t.Stop();
+    public void Execute()
+    {
+        _t.Stop();
     }
 }
