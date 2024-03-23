@@ -1,6 +1,5 @@
 namespace SpaceBattle.Lib;
 using Hwdtech;
-
 public class InitCommand : ICommand
 {
     public void Execute()
@@ -16,36 +15,49 @@ public class InitCommand : ICommand
                     IoC.Resolve<ICommand>("Game.Commands.CreateAndStartThread").Execute();
                 }
             });
-
         }).Execute();
+
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Commands.ExeptionHandler", (object[] args) =>
+       {
+           var errorFile = IoC.Resolve<string>("GetLogFilePath");
+           return new ActionCommand(() =>
+           {
+               using (var sw = File.AppendText(errorFile))
+               {
+                   sw.WriteLine("Error occured");
+               }
+           });
+       }).Execute();
 
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Commands.StopServerCommand", (object[] args) =>
         {
             var ThreadList = IoC.Resolve<List<int>>("Game.Commands.GetThreadIDs");
             return new ActionCommand(() =>
             {
+                var barrier = new Barrier(ThreadList.Count() + 1);
+                var task = new List<Task>();
                 foreach (var i in ThreadList)
                 {
-                    try
+                    var stopcmd = IoC.Resolve<ICommand>("Game.Commands.SoftStopThread", i);
+                    var expcmd = IoC.Resolve<ICommand>("Game.Commands.ExeptionHandler", stopcmd);
+                    task.Add(Task.Run(() =>
                     {
-                        IoC.Resolve<ICommand>("Game.Commands.SoftStopThread", i).Execute();
-                    }
-                    catch (Exception e)
-                    {
-                        // var errorFile = Path.GetTempFileName();
-                        // File.WriteAllText(errorFile, e.ToString());
-                        IoC.Resolve<ICommand>("Game.Commands.ExeptionLog", IoC.Resolve<string>("GetLogFilePath"), e).Execute();
-                    }
-                }
-            });
-        }).Execute();
+                        try
+                        {
+                            stopcmd.Execute();
+                            barrier.SignalAndWait();
+                        }
+                        catch
+                        {
+                            expcmd.Execute();
+                            barrier.SignalAndWait();
+                        }
 
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Commands.ExeptionLog", (object[] args) =>
-        {
-            var errorFile = (string)args[0];
-            return new ActionCommand(() =>
-            {
-                File.WriteAllText(errorFile, "Error occurred");
+                    }));
+                }
+
+                barrier.SignalAndWait();
+                Task.WaitAll(task.ToArray());
             });
         }).Execute();
     }
