@@ -72,13 +72,10 @@ public class ServerThread
         {
             return _thread == (Thread)obj;
         }
-
-        if (GetType() != obj.GetType())
+        else
         {
             return false;
         }
-
-        return false;
     }
 
     public override int GetHashCode()
