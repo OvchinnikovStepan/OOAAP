@@ -216,4 +216,13 @@ public class ServerThreadTest_Exeption
 
         Assert.Empty(q); 
     }
+    [Fact]
+    public void EqualsTest()
+    {
+         var q = new BlockingCollection<ICommand>(100);
+         var t = new ServerThread(q);
+        t.Equals(null);
+        var a = 123;
+        t.Equals(a);
+    }
 }
