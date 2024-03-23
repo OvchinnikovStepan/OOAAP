@@ -32,6 +32,5 @@ jobs:
 
       - name: Checkstyle
         run:
-           cd spacebattle && dotnet format
-           dotnet format --verify-no-changes
+           cd spacebattle && dotnet format --verify-no-changes
       
