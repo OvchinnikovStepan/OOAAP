@@ -110,5 +110,110 @@ public class ServerThreadTest_Exeption
         cmd.Verify(cmd=>cmd.Execute(),Times.Exactly(4));
     }
 
+    
+     [Fact]
+    public void HardStopCommandShouldStopServer()
+    {
 
+        var mre = new ManualResetEvent(false);
+        var q = new BlockingCollection<ICommand>(100);
+        var t = new ServerThread(q);
+        t.GetHashCode();
+        var hs = IoC.Resolve<ICommand>("Server.Commands.HardStop", t, ()=>{mre.Set();});
+
+        q.Add(new ActionCommand(()=> {}));
+        q.Add(new ActionCommand(()=> {Thread.Sleep(3000);}));
+        q.Add(hs);
+        q.Add(new ActionCommand(()=> {}));
+
+        t.Start();
+        mre.WaitOne();
+
+        
+        Assert.Single(q); 
+    }
+       [Fact]
+    public void HardStopWrongThreadDoesNotOccure()
+    {
+
+        var mre = new ManualResetEvent(false);
+        var q1 = new BlockingCollection<ICommand>(100);
+        var t1 = new ServerThread(q1);
+        var q2 = new BlockingCollection<ICommand>(100);
+        var t2 = new ServerThread(q2);
+        var endcmd = new Mock<ICommand>();
+        endcmd.Setup(endcmd=>endcmd.Execute()).Verifiable();
+
+        var wronghs = IoC.Resolve<ICommand>("Server.Commands.HardStop", t2, ()=>{endcmd.Object.Execute();});
+        var hs1 = IoC.Resolve<ICommand>("Server.Commands.HardStop", t1);
+        var hs2 = IoC.Resolve<ICommand>("Server.Commands.HardStop", t2, ()=>{mre.Set();});
+        q1.Add(new ActionCommand(()=> {}));
+        q1.Add(new ActionCommand(()=> {Thread.Sleep(1000);}));
+        q1.Add(wronghs);
+        q1.Add(hs1);
+        q1.Add(new ActionCommand(()=> {}));
+
+        q2.Add(new ActionCommand(()=> {}));
+        q2.Add(new ActionCommand(()=> {Thread.Sleep(3000);}));
+        q2.Add(hs2);
+        t1.Start();
+        t2.Start();
+        mre.WaitOne();
+
+        endcmd.Verify(endcmd=>endcmd.Execute(),Times.Never());
+        Assert.Single(q1); 
+    }
+         [Fact]
+    public void SoftStopWrongThreadDoesNotOccure()
+    {
+
+        var mre = new ManualResetEvent(false);
+        var q1 = new BlockingCollection<ICommand>(100);
+        var t1 = new ServerThread(q1);
+        var q2 = new BlockingCollection<ICommand>(100);
+        var t2 = new ServerThread(q2);
+        var endcmd = new Mock<ICommand>();
+        endcmd.Setup(endcmd=>endcmd.Execute()).Verifiable();
+
+        var wrongss = IoC.Resolve<ICommand>("Server.Commands.SoftStop", t2, ()=>{endcmd.Object.Execute();});
+        var ss1 = IoC.Resolve<ICommand>("Server.Commands.SoftStop", t1);
+        var ss2 = IoC.Resolve<ICommand>("Server.Commands.SoftStop", t2, ()=>{mre.Set();});
+        q1.Add(new ActionCommand(()=> {}));
+        q1.Add(wrongss);    
+
+        q2.Add(new ActionCommand(()=> {}));
+        q2.Add(new ActionCommand(()=> {Thread.Sleep(3000);}));
+
+        t1.Start();
+        t2.Start();
+        q1.Add(new ActionCommand(()=> {Thread.Sleep(1000);}));
+        q1.Add(ss1);
+        q1.Add(new ActionCommand(()=> {}));
+
+        q2.Add(new ActionCommand(()=> {Thread.Sleep(1000);}));
+        q2.Add(ss2);
+        mre.WaitOne();
+
+        endcmd.Verify(endcmd=>endcmd.Execute(),Times.Never());
+        Assert.Empty(q1); 
+    }
+     [Fact]
+    public void SoftStopCommandShouldStopServer()
+    {
+
+        var mre = new ManualResetEvent(false);
+        var q = new BlockingCollection<ICommand>(100);
+        var t = new ServerThread(q);
+
+        var ss = new SoftStopCommand(t, ()=>{mre.Set();});
+        q.Add(new ActionCommand(()=> {}));
+        q.Add(new ActionCommand(()=> {Thread.Sleep(3000);}));
+        q.Add(ss);
+        q.Add(new ActionCommand(()=> {}));
+
+        t.Start();
+        mre.WaitOne();
+
+        Assert.Empty(q); 
+    }
 }
