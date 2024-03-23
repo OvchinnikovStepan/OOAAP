@@ -12,7 +12,7 @@ public class ServerThreadTest_HardStop
         var mre = new ManualResetEvent(false);
         var q = new BlockingCollection<ICommand>(100);
         var t = new ServerThread(q);
-
+        t.GetHashCode();
         var hs = IoC.Resolve<ICommand>("Server.Commands.HardStop", t, ()=>{mre.Set();});
 
         q.Add(new ActionCommand(()=> {}));

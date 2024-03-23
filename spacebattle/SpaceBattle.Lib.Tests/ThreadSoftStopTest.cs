@@ -21,7 +21,7 @@ public class ServerThreadTest_SoftStop
         t.Start();
         mre.WaitOne();
 
-        mre.Set();
+       // mre.Set();
         Assert.Empty(q); 
     }
 }

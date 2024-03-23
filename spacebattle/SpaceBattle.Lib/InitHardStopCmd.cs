@@ -12,14 +12,19 @@ public class InitHardStopCmd: Hwdtech.ICommand
             {
                 return new ActionCommand(()=>
                 {
-                    new HardStopCommand((ServerThread)args[0]).Execute();
-                    new ActionCommand((Action)args[1]).Execute();
-                });
+                    if(((ServerThread)args[0]).Equals(Thread.CurrentThread))
+                    {
+                       new HardStopCommand((ServerThread)args[0]).Execute();
+                       new ActionCommand((Action)args[1]).Execute();
+                    }
+                 });
             }
             
             return new ActionCommand(() => {
-                new HardStopCommand((ServerThread)args[0]).Execute();
-            });
+                  if(((ServerThread)args[0]).Equals(Thread.CurrentThread))
+                    {
+                       new HardStopCommand((ServerThread)args[0]).Execute();
+                    }  });
         }).Execute();
     }
 }

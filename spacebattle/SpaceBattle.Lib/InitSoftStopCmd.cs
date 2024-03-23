@@ -14,6 +14,6 @@ public class InitSoftStopCmd: Hwdtech.ICommand
             }
 
             return new SoftStopCommand((ServerThread)args[0],()=>{});
-        });
+        }).Execute();
     }
 }

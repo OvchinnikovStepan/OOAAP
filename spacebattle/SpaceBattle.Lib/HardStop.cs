@@ -7,9 +7,6 @@ public class HardStopCommand: Hwdtech.ICommand {
     }
 
     public void Execute() {
-        if (_t.Equals(Thread.CurrentThread))
-        {
              _t.Stop();
-        }
     }
 }
