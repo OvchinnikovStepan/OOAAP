@@ -30,6 +30,7 @@ public class ServerThreadTest_Exeption
         new InitCreateStartRegisterThreadCmd().Execute();
         new InitSendCommandCmd().Execute();
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register","GetQueueCollection",(object[] args)=>{return queueCollection;}).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register","GetThreadCollection",(object[] args)=>{return threadCollection;}).Execute();
     }
 
     [Fact]
@@ -80,6 +81,7 @@ public class ServerThreadTest_Exeption
     {
         Assert.Empty(IoC.Resolve<Dictionary<int,BlockingCollection<ICommand>>>("GetQueueCollection"));
 
+        var mre = new ManualResetEvent(false);
         var cmd = new Mock<ICommand>();
         cmd.Setup(cmd=>cmd.Execute()).Verifiable();
         var startcmd = new Mock<ICommand>();
@@ -93,6 +95,8 @@ public class ServerThreadTest_Exeption
        
         IoC.Resolve<Hwdtech.ICommand>("Server.Commands.SendCommand",1,cmd.Object).Execute();
         IoC.Resolve<Hwdtech.ICommand>("Server.Commands.SendCommand",2,cmd.Object).Execute();
+
+       Thread.Sleep(5000);
 
         startcmd.Verify(cmd=>cmd.Execute(),Times.Once());
         cmd.Verify(cmd=>cmd.Execute(),Times.Exactly(2));
