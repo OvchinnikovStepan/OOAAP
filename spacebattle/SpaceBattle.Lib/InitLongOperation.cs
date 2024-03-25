@@ -1,4 +1,4 @@
-using Hwdtech;
+﻿using Hwdtech;
 
 namespace SpaceBattle.Lib
 {
@@ -10,6 +10,5 @@ namespace SpaceBattle.Lib
            "Game.Commands.InitLO", (object[] args) =>
            { return new LongOperationStrategy((string)args[0], (IUObject)args[1]).Run(); }).Execute();
         }
-
     }
 }
