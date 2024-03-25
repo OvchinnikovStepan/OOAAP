@@ -1,4 +1,4 @@
-namespace SpaceBattle.Lib;
+﻿namespace SpaceBattle.Lib;
 using Hwdtech;
 public class InitCommand : ICommand
 {
@@ -10,10 +10,10 @@ public class InitCommand : ICommand
 
             return new ActionCommand(() =>
             {
-                for (var i = 0; i < NumberOfThreads; i++)
+                Enumerable.Range(0, NumberOfThreads).ToList().ForEach(i =>
                 {
                     IoC.Resolve<ICommand>("Game.Commands.CreateAndStartThread").Execute();
-                }
+                });
             });
         }).Execute();
 
@@ -24,7 +24,8 @@ public class InitCommand : ICommand
            {
                using (var sw = File.AppendText(errorFile))
                {
-                   sw.WriteLine("Error occured");
+                   sw.WriteLine($"Error occurred in command: {args[0]}");
+                   sw.WriteLine($"Exception: {args[1]}");
                }
            });
        }).Execute();
@@ -34,30 +35,14 @@ public class InitCommand : ICommand
             var ThreadList = IoC.Resolve<List<int>>("Game.Commands.GetThreadIDs");
             return new ActionCommand(() =>
             {
-                var barrier = new Barrier(ThreadList.Count() + 1);
-                var task = new List<Task>();
-                foreach (var i in ThreadList)
+                foreach (var thread_id in ThreadList)
                 {
-                    var stopcmd = IoC.Resolve<ICommand>("Game.Commands.SoftStopThread", i);
-                    var expcmd = IoC.Resolve<ICommand>("Game.Commands.ExeptionHandler", stopcmd);
-                    task.Add(Task.Run(() =>
-                    {
-                        try
-                        {
-                            stopcmd.Execute();
-                            barrier.SignalAndWait();
-                        }
-                        catch
-                        {
-                            expcmd.Execute();
-                            barrier.SignalAndWait();
-                        }
-
-                    }));
+                    IoC.Resolve<ICommand>("Game.Commands.SendCommand", thread_id,
+                        IoC.Resolve<ICommand>("Game.Commands.SoftStopThread", thread_id,
+                            IoC.Resolve<Action>("Game.Commands.StopServerBarrierRemove"))).Execute();
                 }
 
-                barrier.SignalAndWait();
-                Task.WaitAll(task.ToArray());
+                IoC.Resolve<ICommand>("Game.Commands.StopServerBarrierWait").Execute();
             });
         }).Execute();
     }

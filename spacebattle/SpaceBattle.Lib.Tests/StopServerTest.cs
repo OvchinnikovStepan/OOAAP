@@ -1,4 +1,4 @@
-using Hwdtech;
+﻿using Hwdtech;
 using Hwdtech.Ioc;
 namespace SpaceBattle.Lib.Test;
 using Moq;
@@ -24,43 +24,46 @@ public class StopServerTest
     public void StopServer_Test()
     {
         var threadList = new List<int> { 1, 2, 3 };
+        var barrier = new Barrier(4);
         var stopCommand = new Mock<ICommand>();
-        var i = 0;
-        stopCommand.Setup(x => x.Execute()).Callback(() => { i += 1; });
+        stopCommand.Setup(x => x.Execute()).Verifiable();
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Commands.GetThreadIDs", (object[] args) => { return threadList; }).Execute();
+
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Commands.StopServerBarrierRemove", (object[] args) =>
+        {
+            return () => { barrier.RemoveParticipant(); };
+        }).Execute();
+
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Commands.StopServerBarrierWait", (object[] args) =>
+        {
+            return new ActionCommand(() => { barrier.SignalAndWait(); });
+        }).Execute();
 
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Commands.SoftStopThread", (object[] args) =>
         {
+            return new ActionCommand((Action)args[1]);
+        }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Commands.SendCommand", (object[] args) =>
+        {
             return new ActionCommand(() =>
             {
+                ((ICommand)args[1]).Execute();
                 stopCommand.Object.Execute();
             });
         }).Execute();
 
         IoC.Resolve<ICommand>("Game.Commands.StopServerCommand").Execute();
 
-        Assert.Equal(3, i);
+        Assert.Equal(1, barrier.CurrentPhaseNumber);
+        stopCommand.Verify(cmd => cmd.Execute(), Times.Exactly(3));
     }
 
     [Fact]
     public void StopServer_TestwithExeption()
     {
-        var threadList = new List<int> { 1 };
-        var stopCommand = new Mock<ICommand>();
-        stopCommand.Setup(x => x.Execute()).Throws(new Exception());
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Commands.GetThreadIDs", (object[] args) => { return threadList; }).Execute();
+        IoC.Resolve<ICommand>("Game.Commands.ExeptionHandler", new ActionCommand(() => { }), new Exception()).Execute();
 
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Commands.SoftStopThread", (object[] args) =>
-        {
-            return new ActionCommand(() =>
-            {
-                stopCommand.Object.Execute();
-            });
-        }).Execute();
-
-        IoC.Resolve<ICommand>("Game.Commands.StopServerCommand").Execute();
-
-        var testString = "Error occured\n";
+        var testString = "Error occurred in command: SpaceBattle.Lib.ActionCommand\r\nException: System.Exception: Exception of type 'System.Exception' was thrown.\r\n";
         Assert.Equal(File.ReadAllText(IoC.Resolve<string>("GetLogFilePath")), testString);
     }
 }

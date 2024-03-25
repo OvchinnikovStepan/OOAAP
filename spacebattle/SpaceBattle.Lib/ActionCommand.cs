@@ -1,4 +1,5 @@
-namespace SpaceBattle.Lib;
+﻿namespace SpaceBattle.Lib;
+
 public class ActionCommand : Hwdtech.ICommand
 {
     private readonly Action _action;
