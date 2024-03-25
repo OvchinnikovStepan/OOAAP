@@ -131,8 +131,6 @@ public class ServerThreadTest_Exeption
         q.Add(hs);
         q.Add(new ActionCommand(() => { }));
 
-        t.Equals(null);
-
         t.Start();
         mre.WaitOne();
 
@@ -221,5 +219,13 @@ public class ServerThreadTest_Exeption
         mre.WaitOne();
 
         Assert.Empty(q);
+    }
+    [Fact]
+    public void EqualsTest()
+    {
+        var q = new BlockingCollection<ICommand>(100);
+        var t = new ServerThread(q);
+
+        t.Equals(null);
     }
 }
