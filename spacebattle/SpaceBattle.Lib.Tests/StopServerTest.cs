@@ -63,7 +63,7 @@ public class StopServerTest
     {
         IoC.Resolve<ICommand>("Game.Commands.ExeptionHandler", new ActionCommand(() => { }), new Exception()).Execute();
 
-        var testString = "Error occurred in command: SpaceBattle.Lib.ActionCommand\r\nException: System.Exception: Exception of type 'System.Exception' was thrown.\r\n";
+        var testString = "Error occurred in command: SpaceBattle.Lib.ActionCommand\nException: System.Exception: Exception of type 'System.Exception' was thrown.\n";
         Assert.Equal(File.ReadAllText(IoC.Resolve<string>("GetLogFilePath")), testString);
     }
 }
