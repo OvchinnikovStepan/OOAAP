@@ -131,6 +131,8 @@ public class ServerThreadTest_Exeption
         q.Add(hs);
         q.Add(new ActionCommand(() => { }));
 
+        t.Equals(null);
+
         t.Start();
         mre.WaitOne();
 

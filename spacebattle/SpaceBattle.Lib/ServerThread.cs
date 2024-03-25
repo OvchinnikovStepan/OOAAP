@@ -63,7 +63,7 @@ public class ServerThread
     }
     public override bool Equals(object? obj)
     {
-        return obj!=null && obj is Thread thread && _thread==thread;
+        return obj != null && obj is Thread thread && _thread == thread;
     }
 
     public override int GetHashCode()
