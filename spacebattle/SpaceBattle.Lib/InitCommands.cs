@@ -1,4 +1,5 @@
 ﻿namespace SpaceBattle.Lib;
+using System.Linq;
 using Hwdtech;
 public class InitCommand : Hwdtech.ICommand
 {
@@ -35,12 +36,12 @@ public class InitCommand : Hwdtech.ICommand
             var ThreadList = IoC.Resolve<List<int>>("Game.Commands.GetThreadIDs");
             return new ActionCommand(() =>
             {
-                foreach (var thread_id in ThreadList)
-                {
-                    IoC.Resolve<Hwdtech.ICommand>("Game.Commands.SendCommand", thread_id,
-                        IoC.Resolve<Hwdtech.ICommand>("Game.Commands.SoftStopThread", thread_id,
-                            IoC.Resolve<Action>("Game.Commands.StopServerBarrierRemove"))).Execute();
-                }
+                ThreadList.ForEach(thread_id =>
+                 {
+                     IoC.Resolve<Hwdtech.ICommand>("Game.Commands.SendCommand", thread_id,
+                IoC.Resolve<Hwdtech.ICommand>("Game.Commands.SoftStopThread", thread_id,
+                IoC.Resolve<Action>("Game.Commands.StopServerBarrierRemove"))).Execute();
+                 });
 
                 IoC.Resolve<Hwdtech.ICommand>("Game.Commands.StopServerBarrierWait").Execute();
             });
