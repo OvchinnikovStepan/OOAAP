@@ -66,4 +66,50 @@ public class StopServerTest
         var testString = "Error occurred in command: SpaceBattle.Lib.ActionCommand\nException: System.Exception: Exception of type 'System.Exception' was thrown.\n";
         Assert.Equal(File.ReadAllText(IoC.Resolve<string>("GetLogFilePath")), testString);
     }
+    // [Fact]
+    // public void Console_Server_Test()
+    // {
+    //     IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", IoC.Resolve<object>("Scopes.New", IoC.Resolve<object>("Scopes.Root"))).Execute();
+
+    //     IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Commands.CreateAndStartThread", (object[] args) =>
+    //     {
+    //         return new ActionCommand(() => { });
+    //     }).Execute();
+    //     IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Commands.GetThreadIDs", (object[] args) => { return new List<int>(); }).Execute();
+
+    //     IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Commands.StopServerBarrierRemove", (object[] args) =>
+    //     {
+    //         return () => { };
+    //     }).Execute();
+
+    //     IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Commands.StopServerBarrierWait", (object[] args) =>
+    //     {
+    //         return new ActionCommand(() => { });
+    //     }).Execute();
+
+    //     IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Commands.SoftStopThread", (object[] args) =>
+    //     {
+    //         return new ActionCommand((Action)args[1]);
+    //     }).Execute();
+    //     IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Commands.SendCommand", (object[] args) =>
+    //     {
+    //         return new ActionCommand(() => { });
+    //     }).Execute();
+
+    //     var consoleInput = new StringReader("any");
+    //     var consoleOutput = new StringWriter();
+
+    //     Console.SetIn(consoleInput);
+    //     Console.SetOut(consoleOutput);
+    //     var sizeServer = 1;
+
+    //     //var serverprogramm = new ActionCommand(() => { ServerProgram.Run(new int[] { sizeServer }); });
+    //     var app = new ServerProgram();
+    //     app.Run(sizeServer);
+
+    //     var output = consoleOutput.ToString();
+    //     Assert.Contains($" Сервер запускается с количеством потоков  {sizeServer}", output);
+    //     Assert.Contains("Нажмите любую клавишу, чтобы остановить сервер ...", output);
+    //     Assert.Contains("Сервер успешно остановил свою работу. Нажмите любую клавишу для выхода...", output);
+    // }
 }
