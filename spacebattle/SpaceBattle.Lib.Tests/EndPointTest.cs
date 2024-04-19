@@ -9,7 +9,7 @@ public class EndPointTest
 {
     public EndPointTest()
     {
-         new InitScopeBasedIoCImplementationCommand().Execute();
+        new InitScopeBasedIoCImplementationCommand().Execute();
         IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", IoC.Resolve<object>("Scopes.New", IoC.Resolve<object>("Scopes.Root"))).Execute();
 
     }
@@ -23,13 +23,13 @@ public class EndPointTest
                 OrderType="start movement",
                 GameId="1",
                 ObjectId="1",
-                Properties=new(){{'Velocity',1}}
+                Properties=new(){{"Velocity",1}}
             },
             new(){
                 OrderType="start rotatement",
                 GameId="1",
                 ObjectId="1",
-                Properties=new(){{'A_Velocity',1}}
+                Properties=new(){{"A_Velocity",1}}
             },
             new(){
                 OrderType="stop all movement",
@@ -40,7 +40,7 @@ public class EndPointTest
                 OrderType="fire",
                 GameId="1",
                 ObjectId="1",
-                Properties=new(){{'Weapon_Type',"EnergyBlast"}}
+                Properties=new(){{"Weapon_Type","EnergyBlast"}}
             }
         };
         var CreateOrderCmd=new Mock<ICommand>();
@@ -56,7 +56,7 @@ public class EndPointTest
         }).Execute();
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register","Server.Commands.SendCommand", (object[] args)=>
         {
-            return new ActionCommand(()=>{q.Add((Hwdtech.ICommand)args[1])});
+            return new ActionCommand(()=>{q.Add((Hwdtech.ICommand)args[1]);});
         }).Execute();
 
         var webApi=new WebApi();
