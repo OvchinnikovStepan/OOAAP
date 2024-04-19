@@ -67,8 +67,8 @@ public class EndPointTest
         Assert.Equal(5,q.Count());
         Assert.Equal("Code 202-Accepted",respone);
 
-        q.Take().Execute()
-        q.Take().Execute()
+        q.Take().Execute();
+        q.Take().Execute();
         CreateOrderCmd.Verify(cmd=>cmd.Execute(),Times.Exactly(2));
     }
 }
