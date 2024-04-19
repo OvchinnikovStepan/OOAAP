@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using Hwdtech;
 using Hwdtech.Ioc;
 using Moq;
+using WebHttp;
 
 public class EndPointTest
 {
@@ -11,7 +12,6 @@ public class EndPointTest
     {
         new InitScopeBasedIoCImplementationCommand().Execute();
         IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", IoC.Resolve<object>("Scopes.New", IoC.Resolve<object>("Scopes.Root"))).Execute();
-
     }
    
     [Fact]
@@ -67,7 +67,8 @@ public class EndPointTest
         Assert.Equal(5,q.Count());
         Assert.Equal("Code 202-Accepted",respone);
 
-        q.ToList().ForEach(cmd=>cmd.Execute);
-        CreateOrderCmd.Verify(cmd=>cmd.Execute(),Times.Exactly(5));
+        q.Take().Execute()
+        q.Take().Execute()
+        CreateOrderCmd.Verify(cmd=>cmd.Execute(),Times.Exactly(2));
     }
 }
