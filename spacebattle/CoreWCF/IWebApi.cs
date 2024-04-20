@@ -13,7 +13,7 @@ namespace WebHttp
         [WebInvoke(Method = "POST", UriTemplate = "/body")]
         [OpenApiTag("Tag")]
         [OpenApiResponse(ContentTypes = new[] { "application/json", "text/xml" }, Description = "Success", StatusCode = HttpStatusCode.OK, Type = typeof(ExampleContract)) ]
-        ExampleContract GetOrder(
+        string GetOrder(
             [OpenApiParameter(ContentTypes = new[] { "application/json", "text/xml" }, Description = "param description.")] ExampleContract param);
     }
 }

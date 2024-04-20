@@ -1,6 +1,6 @@
 ﻿using Hwdtech;
 using Hwdtech.Ioc;
-namespace SpaceBattle.Lib.Test;
+namespace SpaceBattle.Lib.Tests;
 using Moq;
 
 public class StopServerTest
