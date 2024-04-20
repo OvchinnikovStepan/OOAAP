@@ -13,6 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include"..Spacebattle.Lib.Tests\Spacebattle.Lib.Tests.csproj/">
+    <ProjectReference Include="..Spacebattle.Lib.Tests\Spacebattle.Lib.Tests.csproj/">
   </ItemGroup>
 </Project>
