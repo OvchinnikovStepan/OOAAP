@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
@@ -12,4 +12,7 @@
 	<PackageReference Include="CoreWCF.WebHttp" Version="1.0.0"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include"..Spacebattle.Lib.Tests\Spacebattle.Lib.Tests.csproj/">
+  </ItemGroup>
 </Project>
