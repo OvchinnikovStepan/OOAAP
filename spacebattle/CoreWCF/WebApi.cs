@@ -1,19 +1,17 @@
-using CoreWCF;
+﻿using CoreWCF;
+using Hwdtech;
 using SpaceBattle.Lib;
-using System.Collections;
 
-namespace WebHttp
+namespace SpaceBattle.WebHttp;
+[ServiceBehavior(IncludeExceptionDetailInFaults = true)]
+public class WebApi : IWebApi
 {
-    [ServiceBehavior(IncludeExceptionDetailInFaults = true)]
-    internal class WebApi : IWebApi
+    public string SendOrder(OrderContract param)
     {
-        public string GetOrder(ExampleContract param)
-        {
-            IoC.Resolve<Hwdtech.ICommand>("Server.Commands.SendCommand"
-                ,IoC.Resolve<int>("GetServerIdByGameId",param.GameId),
-                   IoC.Resolve<Hwdtech.ICommand>("CreateOrderCmd", param)).Execute();
-            var respone="Code 202-Accepted";
-            return respone;
-        }
+        var ServerThreadId = IoC.Resolve<IStrategy>("TryGetServerIdByGameId").Run(param.GameId);
+        IoC.Resolve<Hwdtech.ICommand>("Server.Commands.SendCommand"
+            , ServerThreadId,
+               IoC.Resolve<Hwdtech.ICommand>("CreateOrderCmd", param)).Execute();
+        return IoC.Resolve<string>("CreateServerResponse", ServerThreadId);
     }
 }
