@@ -10,15 +10,15 @@ public class OrderContract
 {
     [DataMember(Name = "OrderType", Order = 1)]
     [OpenApiProperty(Description = "OrderType")]
-    public string OrderType { get; set; }
+    public required string OrderType { get; set; }
 
     [DataMember(Name = "GameId", Order = 2)]
     [OpenApiProperty(Description = "GameId")]
-    public string GameId { get; set; }
+    public required string GameId { get; set; }
 
     [DataMember(Name = "ObjectId", Order = 3)]
     [OpenApiProperty(Description = "ObjectId")]
-    public string ObjectId { get; set; }
+    public required string ObjectId { get; set; }
 
     [DataMember(Name = "Properties", Order = 4)]
     [OpenApiProperty(Description = "Properties")]

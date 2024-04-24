@@ -11,7 +11,7 @@ public interface IWebApi
     [OperationContract]
     [WebInvoke(Method = "POST", UriTemplate = "/body")]
     [OpenApiTag("Tag")]
-    [OpenApiResponse(ContentTypes = new[] { "application/json", "text/xml" }, Description = "Success", StatusCode = HttpStatusCode.OK, Type = typeof(OrderContract))]
+    [OpenApiResponse(ContentTypes = new[] { "application/json" }, Description = "Success", StatusCode = HttpStatusCode.OK, Type = typeof(OrderContract))]
     string SendOrder(
-        [OpenApiParameter(ContentTypes = new[] { "application/json", "text/xml" }, Description = "param description.")] OrderContract param);
+        [OpenApiParameter(ContentTypes = new[] { "application/json" }, Description = "param description.")] OrderContract param);
 }

@@ -1,6 +1,5 @@
 ﻿namespace SpaceBattle.Lib.Tests;
 
-using System.Collections.Concurrent;
 using Hwdtech;
 using Hwdtech.Ioc;
 using Moq;
@@ -12,27 +11,13 @@ public class EndPointTest
     {
         new InitScopeBasedIoCImplementationCommand().Execute();
         IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", IoC.Resolve<object>("Scopes.New", IoC.Resolve<object>("Scopes.Root"))).Execute();
-
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "CreateServerResponse", (object[] args) =>
-        {
-            if (args[0] != null && args[0] is int id && id == 10)
-            {
-                return "Code 202 - Accepted";
-            }
-            else
-            {
-                return "Code 400 - Entered id does not exist";
-            }
-        }).Execute();
     }
 
     [Fact]
     public void EndPoint_works_correctly()
     {
-        var IdGetter = new Mock<IStrategy>();
-        IdGetter.Setup(x => x.Run(It.IsAny<string>())).Returns(10).Verifiable();
-
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "TryGetServerIdByGameId", (object[] args) => { return IdGetter.Object; }).Execute();
+        var id = 1;
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "TryGetServerIdByGameId", (object[] args) => { return (object)id; }).Execute();
 
         var orders = new List<OrderContract>()
         {
@@ -64,8 +49,6 @@ public class EndPointTest
 
         CreateOrderCmd.Setup(cmd => cmd.Execute()).Verifiable();
 
-        var q = new BlockingCollection<Hwdtech.ICommand>(10);
-
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "CreateOrderCmd", (object[] args) =>
         {
             return CreateOrderCmd.Object;
@@ -73,28 +56,26 @@ public class EndPointTest
 
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Server.Commands.SendCommand", (object[] args) =>
         {
-            return new ActionCommand(() => { q.Add((Hwdtech.ICommand)args[1]); });
+            return new ActionCommand(() => { ((Hwdtech.ICommand)args[1]).Execute(); });
         }).Execute();
 
         var webApi = new WebApi();
 
         var respone = webApi.SendOrder(orders[0]);
         orders.ForEach(order => webApi.SendOrder(order));
-
-        Assert.Equal(5, q.Count());
-        Assert.Equal("Code 202 - Accepted", respone);
-
-        q.Take().Execute();
-        q.Take().Execute();
-        CreateOrderCmd.Verify(cmd => cmd.Execute(), Times.Exactly(2));
+        Assert.Equal("OK", respone);
+        CreateOrderCmd.Verify(cmd => cmd.Execute(), Times.Exactly(5));
     }
     [Fact]
-    public void EndPoint_NoIdFoundTest()
+    public void EndPoint_AttemtToGetServerIdCauseExeption()
     {
-        var IdGetter = new Mock<IStrategy>();
-        IdGetter.Setup(x => x.Run(It.IsAny<string>())).Returns("Whatever").Verifiable();
-
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "TryGetServerIdByGameId", (object[] args) => { return IdGetter.Object; }).Execute();
+        var exeptioncmd = new Mock<Hwdtech.ICommand>();
+        exeptioncmd.Setup(x => x.Execute()).Throws(new Exception());
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "TryGetServerIdByGameId", (object[] args) =>
+                {
+                    exeptioncmd.Object.Execute();
+                    return (object)1;
+                }).Execute();
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "CreateOrderCmd", (object[] args) =>
         {
             return new ActionCommand(() => { });
@@ -107,12 +88,97 @@ public class EndPointTest
         var webApi = new WebApi();
         var order = new OrderContract()
         {
-            OrderType = "start movement",
+            OrderType = "fire",
             GameId = "1",
             ObjectId = "1",
-            Properties = new Dictionary<string, object>() { { "Velocity", 1 } }
+            Properties = new Dictionary<string, object>() { { "Weapon_Type", "EnergyBlast" } }
         };
-        var respone = webApi.SendOrder(order);
-        Assert.Equal("Code 400 - Entered id does not exist", respone);
+        Assert.Throws<Exception>(new ActionCommand(() => { webApi.SendOrder(order); }).Execute);
+    }
+    [Fact]
+    public void EndPoint_AttemtToCreateCmdCauseExeption()
+    {
+        var exeptioncmd = new Mock<Hwdtech.ICommand>();
+        exeptioncmd.Setup(x => x.Execute()).Throws(new Exception());
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "TryGetServerIdByGameId", (object[] args) =>
+                {
+                    return (object)1;
+                }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "CreateOrderCmd", (object[] args) =>
+        {
+            exeptioncmd.Object.Execute();
+            return new ActionCommand(() => { });
+        }).Execute();
+
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Server.Commands.SendCommand", (object[] args) =>
+        {
+            return new ActionCommand(() => { });
+        }).Execute();
+        var webApi = new WebApi();
+        var order = new OrderContract()
+        {
+            OrderType = "fire",
+            GameId = "1",
+            ObjectId = "1",
+            Properties = new Dictionary<string, object>() { { "Weapon_Type", "EnergyBlast" } }
+        };
+        Assert.Throws<Exception>(new ActionCommand(() => { webApi.SendOrder(order); }).Execute);
+    }
+    [Fact]
+    public void EndPoint_AttemtToCreateSendCommandCauseExeption()
+    {
+        var exeptioncmd = new Mock<Hwdtech.ICommand>();
+        exeptioncmd.Setup(x => x.Execute()).Throws(new Exception());
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "TryGetServerIdByGameId", (object[] args) =>
+                {
+                    return (object)1;
+                }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "CreateOrderCmd", (object[] args) =>
+        {
+            return new ActionCommand(() => { });
+        }).Execute();
+
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Server.Commands.SendCommand", (object[] args) =>
+        {
+            exeptioncmd.Object.Execute();
+            return new ActionCommand(() => { });
+        }).Execute();
+        var webApi = new WebApi();
+        var order = new OrderContract()
+        {
+            OrderType = "fire",
+            GameId = "1",
+            ObjectId = "1",
+            Properties = new Dictionary<string, object>() { { "Weapon_Type", "EnergyBlast" } }
+        };
+        Assert.Throws<Exception>(new ActionCommand(() => { webApi.SendOrder(order); }).Execute);
+    }
+    [Fact]
+    public void EndPoint_AttemtToCreateSendCommandReturnBrokenCommand()
+    {
+        var exeptioncmd = new Mock<Hwdtech.ICommand>();
+        exeptioncmd.Setup(x => x.Execute()).Throws(new Exception());
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "TryGetServerIdByGameId", (object[] args) =>
+                {
+                    return (object)1;
+                }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "CreateOrderCmd", (object[] args) =>
+        {
+            return new ActionCommand(() => { });
+        }).Execute();
+
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Server.Commands.SendCommand", (object[] args) =>
+        {
+            return exeptioncmd.Object;
+        }).Execute();
+        var webApi = new WebApi();
+        var order = new OrderContract()
+        {
+            OrderType = "fire",
+            GameId = "1",
+            ObjectId = "1",
+            Properties = new Dictionary<string, object>() { { "Weapon_Type", "EnergyBlast" } }
+        };
+        Assert.Throws<Exception>(new ActionCommand(() => { webApi.SendOrder(order); }).Execute);
     }
 }

@@ -9,7 +9,6 @@ using Swashbuckle.AspNetCore.Swagger;
 [ExcludeFromCodeCoverage]
 internal sealed class Startup
 {
-    [ExcludeFromCodeCoverage]
     public static void ConfigureServices(IServiceCollection services)
     {
         services.AddServiceModelWebServices(o =>
@@ -27,7 +26,6 @@ internal sealed class Startup
 
         services.AddSingleton(new SwaggerOptions());
     }
-    [ExcludeFromCodeCoverage]
     public static void Configure(IApplicationBuilder app)
     {
         app.UseMiddleware<SwaggerMiddleware>();
