@@ -5,10 +5,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
 using System.Xml;
 using SpaceBattle.WebHttp;
+using System.Diagnostics.CodeAnalysis;
 
+[ExcludeFromCodeCoverage]
 internal sealed class Startup
 {
-    public void ConfigureServices(IServiceCollection services)
+    static void ConfigureServices(IServiceCollection services)
     {
         services.AddServiceModelWebServices(o =>
         {
@@ -26,7 +28,7 @@ internal sealed class Startup
         services.AddSingleton(new SwaggerOptions());
     }
 
-    public void Configure(IApplicationBuilder app)
+    public static void Configure(IApplicationBuilder app)
     {
         app.UseMiddleware<SwaggerMiddleware>();
         app.UseSwaggerUI();
