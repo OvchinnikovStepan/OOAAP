@@ -1,7 +1,7 @@
 ﻿using Hwdtech;
 namespace SpaceBattle.Lib
 {
-    public class InterpreterCommand : ICommand
+    public class InterpreterCommand : Hwdtech.ICommand
     {
         private readonly IMessage _customMessage;
 
@@ -11,10 +11,10 @@ namespace SpaceBattle.Lib
         }
         public void Execute()
         {
-            var cmd = IoC.Resolve<ICommand>("Game.CreateCommand", _customMessage);
+            var cmd = IoC.Resolve<Hwdtech.ICommand>("Game.CreateCommand", _customMessage);
 
             var id = _customMessage.GameID;
-            IoC.Resolve<ICommand>("Game.Queue.Push", id, cmd).Execute();
+            IoC.Resolve<Hwdtech.ICommand>("Game.Queue.Push", id, cmd).Execute();
         }
     }
 }
