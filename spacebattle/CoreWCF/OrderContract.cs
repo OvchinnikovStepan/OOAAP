@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 using CoreWCF.OpenApi.Attributes;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SpaceBattle.WebHttp;
 [DataContract(Name = "OrderContract", Namespace = "http://example.com")]
