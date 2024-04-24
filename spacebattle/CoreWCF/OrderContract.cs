@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 using CoreWCF.OpenApi.Attributes;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SpaceBattle.WebHttp;
 [DataContract(Name = "OrderContract", Namespace = "http://example.com")]
+[ExcludeFromCodeCoverage]
 public class OrderContract
 {
     [DataMember(Name = "OrderType", Order = 1)]
