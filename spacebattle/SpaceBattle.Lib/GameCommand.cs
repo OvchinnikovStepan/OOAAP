@@ -33,8 +33,9 @@ public class GameCommand : ICommand
             finally
             {
                 stopwatch.Stop();
-            }        
+            }
         }
+
         stopwatch.Reset();
     }
 }
