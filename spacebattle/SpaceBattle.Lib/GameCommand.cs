@@ -17,10 +17,10 @@ public class GameCommand : ICommand
     {
         var quant = (double)IoC.Resolve<object>("GetGameQuant");
         IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", Scope).Execute();
-        stopwatch.Start();
 
         while ((quant >= stopwatch.ElapsedMilliseconds) && (!Source.IsEmpty()))
         {
+            stopwatch.Start();
             var command = Source.Take();
             try
             {
@@ -30,8 +30,11 @@ public class GameCommand : ICommand
             {
                 IoC.Resolve<Hwdtech.ICommand>("Game.Commands.ExceptionHandler", command, e).Execute();
             }
+            finally
+            {
+                stopwatch.Stop();
+            }        
         }
-
         stopwatch.Reset();
     }
 }
