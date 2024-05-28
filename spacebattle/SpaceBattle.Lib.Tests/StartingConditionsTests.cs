@@ -11,7 +11,7 @@ public class StartConditionsTests
         IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", IoC.Resolve<object>("Scopes.New", IoC.Resolve<object>("Scopes.Root"))).Execute();
     }
     [Fact]
-    public void Test_Creating_IUObjcet_List_Succesfuly()
+    public void Test_Creating_IUObjcet_List_Successfully()
     {
         var IUobjectlist = new Dictionary<int, IUObject>();
         var obj = new Mock<IUObject>();
@@ -64,7 +64,7 @@ public class StartConditionsTests
         Assert.Throws<Exception>(() => { new CreateStartingIUObjectListCommand(3).Execute(); });
     }
     [Fact]
-    public void Test_Arranging_One_SpaceShip_Succecfully()
+    public void Test_Arranging_One_SpaceShip_Successfully()
     {
         var obj = new Mock<IUObject>();
         var somecommand = new Mock<Hwdtech.ICommand>();
@@ -132,5 +132,114 @@ public class StartConditionsTests
             return new ActionCommand(() => { somecommand.Object.Execute(); });
         }).Execute();
         Assert.Throws<Exception>(() => { new ArrangeOneSpaceShipCommand(obj.Object, iterator.Object).Execute(); });
+    }
+    [Fact]
+    public void Test_Arranging_SpaceShips_Successfully()
+    {
+        var spaceships = new List<IUObject>() { new Mock<IUObject>().Object, new Mock<IUObject>().Object };
+        var iterator = new Mock<IEnumerator<object>>();
+        iterator.Setup(x => x.Reset()).Verifiable();
+        var somecommand = new Mock<Hwdtech.ICommand>();
+        somecommand.Setup(x => x.Execute()).Verifiable();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Iterators.Position", (object[] args) =>
+        {
+            return iterator.Object;
+        }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Arrange.SpaceShip", (object[] args) =>
+        {
+            return somecommand.Object;
+        }).Execute();
+        new ArrangeSpaceShipsCommand(spaceships).Execute();
+        iterator.Verify(x => x.Reset(), Times.Once());
+        somecommand.Verify(x => x.Execute(), Times.Exactly(2));
+    }
+
+    [Fact]
+    public void Test_Arranging_SpaceShips_Dissability_To_Get_Iterator_Cause_Exception()
+    {
+        var spaceships = new List<IUObject>() { new Mock<IUObject>().Object, new Mock<IUObject>().Object };
+        var iterator = new Mock<IEnumerator<object>>();
+        iterator.Setup(x => x.Reset()).Verifiable();
+        var somecommand = new Mock<Hwdtech.ICommand>();
+        somecommand.Setup(x => x.Execute()).Verifiable();
+
+        var exeptionCmd = new Mock<Hwdtech.ICommand>();
+        exeptionCmd.Setup(x => x.Execute()).Throws(new Exception());
+
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Iterators.Position", (object[] args) =>
+        {
+            exeptionCmd.Object.Execute();
+            return iterator.Object;
+        }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Arrange.SpaceShip", (object[] args) =>
+        {
+            return somecommand.Object;
+        }).Execute();
+        Assert.Throws<Exception>(() => { new ArrangeSpaceShipsCommand(spaceships).Execute(); });
+    }
+    [Fact]
+    public void Test_Arranging_SpaceShips_Dissability_To_Arrange_Spaceship_Cause_Exception()
+    {
+        var spaceships = new List<IUObject>() { new Mock<IUObject>().Object, new Mock<IUObject>().Object };
+        var iterator = new Mock<IEnumerator<object>>();
+        iterator.Setup(x => x.Reset()).Verifiable();
+        var somecommand = new Mock<Hwdtech.ICommand>();
+        somecommand.Setup(x => x.Execute()).Verifiable();
+
+        var exeptionCmd = new Mock<Hwdtech.ICommand>();
+        exeptionCmd.Setup(x => x.Execute()).Throws(new Exception());
+
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Iterators.Position", (object[] args) =>
+        {
+            return iterator.Object;
+        }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Arrange.SpaceShip", (object[] args) =>
+        {
+            exeptionCmd.Object.Execute();
+            return somecommand.Object;
+        }).Execute();
+        Assert.Throws<Exception>(() => { new ArrangeSpaceShipsCommand(spaceships).Execute(); });
+    }
+    [Fact]
+    public void Test_Arranging_SpaceShips_Dissability_To_Reset_Iterator_Cause_Exception()
+    {
+        var spaceships = new List<IUObject>() { new Mock<IUObject>().Object, new Mock<IUObject>().Object };
+        var iterator = new Mock<IEnumerator<object>>();
+        iterator.Setup(x => x.Reset()).Throws(new Exception());
+        var somecommand = new Mock<Hwdtech.ICommand>();
+        somecommand.Setup(x => x.Execute()).Verifiable();
+
+        var exeptionCmd = new Mock<Hwdtech.ICommand>();
+        exeptionCmd.Setup(x => x.Execute()).Throws(new Exception());
+
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Iterators.Position", (object[] args) =>
+        {
+            return iterator.Object;
+        }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Arrange.SpaceShip", (object[] args) =>
+        {
+            return somecommand.Object;
+        }).Execute();
+        Assert.Throws<Exception>(() => { new ArrangeSpaceShipsCommand(spaceships).Execute(); });
+    }
+    [Fact]
+    public void Test_Arranging_SpaceShips_Dissability_To_Execute_Arrange_Command_Cause_Exception()
+    {
+        var spaceships = new List<IUObject>() { new Mock<IUObject>().Object, new Mock<IUObject>().Object };
+        var iterator = new Mock<IEnumerator<object>>();
+        iterator.Setup(x => x.Reset()).Throws(new Exception());
+
+        var exeptionCmd = new Mock<Hwdtech.ICommand>();
+        exeptionCmd.Setup(x => x.Execute()).Throws(new Exception());
+
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Iterators.Position", (object[] args) =>
+        {
+            return iterator.Object;
+        }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Arrange.SpaceShip", (object[] args) =>
+        {
+            return exeptionCmd.Object;
+        }).Execute();
+        Assert.Throws<Exception>(() => { new ArrangeSpaceShipsCommand(spaceships).Execute(); });
     }
 }
