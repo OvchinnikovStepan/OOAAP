@@ -1,7 +1,7 @@
 ﻿namespace SpaceBattle.Lib;
 using Hwdtech;
 
-public class ArrangeSpaceShipsCommand : ICommand
+public class ArrangeSpaceShipsCommand : Hwdtech.ICommand
 {
     private readonly IEnumerable<IUObject> spaceships;
 
@@ -12,7 +12,7 @@ public class ArrangeSpaceShipsCommand : ICommand
         var positionIterator = IoC.Resolve<IEnumerator<object>>("Game.Iterators.Position");
 
         spaceships.ToList().ForEach(spaceship =>
-            IoC.Resolve<ICommand>("Game.Arrange.SpaceShip", spaceship, positionIterator).Execute());
+            IoC.Resolve<Hwdtech.ICommand>("Game.Arrange.SpaceShip", spaceship, positionIterator).Execute());
 
         positionIterator.Reset();
     }
