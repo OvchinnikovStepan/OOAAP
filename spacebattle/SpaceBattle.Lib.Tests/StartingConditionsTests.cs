@@ -306,4 +306,22 @@ public class StartConditionsTests
         }).Execute();
         Assert.Throws<Exception>(() => { new SetFuelCommand(spaceships, 10).Execute(); });
     }
+    [Fact]
+    public void Test_Position_Iterator_Works_Successfully()
+    {
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.StartShipPositions", (object[] args) =>
+        {
+            return new List<Vector>() { new Vector(0, 1), new Vector(0, 2) };
+        }).Execute();
+        var iterator = new PositionIterator();
+        var position1 = iterator.Current;
+        iterator.MoveNext();
+        var position2 = iterator.Current;
+        iterator.Reset();
+        var position3 = iterator.Current;
+        Assert.Equal(position1, new Vector(0, 1));
+        Assert.Equal(position2, new Vector(0, 2));
+        Assert.Equal(position1, position3);
+        Assert.Throws<NotImplementedException>(() => { iterator.Dispose(); });
+    }
 }
