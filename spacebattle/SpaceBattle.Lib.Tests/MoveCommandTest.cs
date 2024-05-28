@@ -73,10 +73,8 @@ public class MoveCommandTest
     [Fact]
     public void MoveCommand_Checking_That_Attempt_To_Compare_Null_Vector_Does_Not_Throw_An_Error()
     {
-        var vector = new Vector();
-
         var vector1 = new Vector(12, 5);
 
-        Assert.False(vector1.Equals(vector));
+        Assert.False(vector1.Equals(null));
     }
 }
