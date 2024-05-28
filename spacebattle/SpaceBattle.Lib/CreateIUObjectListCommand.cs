@@ -1,11 +1,11 @@
 ﻿namespace SpaceBattle.Lib;
 using Hwdtech;
 
-public class CreateIUObjectListCommand : Hwdtech.ICommand
+public class CreateStartingIUObjectListCommand : Hwdtech.ICommand
 {
     private readonly int number_of_objects;
 
-    public CreateIUObjectListCommand(int number_of_objects) { this.number_of_objects = number_of_objects; }
+    public CreateStartingIUObjectListCommand(int number_of_objects) { this.number_of_objects = number_of_objects; }
 
     public void Execute()
     {
