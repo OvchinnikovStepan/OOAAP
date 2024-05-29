@@ -45,4 +45,29 @@ public class InitializeGameTests
         var strategy = new GetObjectStrategy();
         Assert.Throws<KeyNotFoundException>(() => strategy.Run(1));
     }
+    [Fact]
+    public void DeleteObjectStrategy_Test_Success()
+    {
+        var objectDict = new Dictionary<int, IUObject>();
+        var obj = new Mock<IUObject>();
+        objectDict.Add(1, obj.Object);
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.IUObject.List", (object[] args) => objectDict).Execute();
+        new DeleteObjectCommand(1).Execute();
+        Assert.Empty(objectDict);
+    }
+    [Fact]
+    public void DeleteObjectStrategy_Test_DisabbilityToGetIUObjectListCauseException()
+    {
+        var objectDict = new Dictionary<int, IUObject>();
+        var obj = new Mock<IUObject>();
+        objectDict.Add(1, obj.Object);
+        var badcmd = new Mock<Hwdtech.ICommand>();
+        badcmd.Setup(x => x.Execute()).Throws(new Exception());
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.IUObject.List", (object[] args) =>
+        {
+            badcmd.Object.Execute();
+            return objectDict;
+        }).Execute();
+        Assert.Throws<Exception>(() => { new DeleteObjectCommand(1).Execute(); });
+    }
 }
