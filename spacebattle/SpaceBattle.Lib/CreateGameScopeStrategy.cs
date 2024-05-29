@@ -19,9 +19,11 @@ public class NewGameScopeStrategy : IStrategy
         IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", gameScope).Execute();
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Quant", (object[] args) => (object)quantum).Execute();
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue", (object[] args) => gameQueue).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.IUObject.List", (object[] args) => new Dictionary<int, IUObject>()).Execute();
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.Pop", (object[] args) => { return new QueuePopStrategy().Run(args); }).Execute();
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.Push", (object[] args) => { return new QueuePushCommand((ICommand)args[0]); }).Execute();
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.IUObject.Delete", (object[] args) => { return new DeleteObjectCommand((int)args[0]); }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.IUObject.Get", (object[] args) => { return new GetObjectStrategy().Run(args); }).Execute();
         IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", parentScope).Execute();
 
         return gameScope;
