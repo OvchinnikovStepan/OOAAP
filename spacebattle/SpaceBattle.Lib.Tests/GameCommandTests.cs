@@ -13,28 +13,6 @@ public class GameCommandTests
     {
         new InitScopeBasedIoCImplementationCommand().Execute();
         IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", IoC.Resolve<object>("Scopes.New", IoC.Resolve<object>("Scopes.Root"))).Execute();
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Commands.ExceptionHandler", (object[] args) =>
-        {
-            if (!(bool)IoC.Resolve<object>("TryFindStrategy", args[0], args[1]))
-            {
-                return IoC.Resolve<Hwdtech.ICommand>("DefaultStrategy", args[0], args[1]);
-            }
-
-            return IoC.Resolve<Hwdtech.ICommand>("ExeptionStrategy", args[0], args[1]);
-        }).Execute();
-    }
-
-    private static void Register_exeption_defualt_handler()
-    {
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Commands.ExceptionHandler", (object[] args) =>
-        {
-            if (!(bool)IoC.Resolve<object>("TryFindStrategy", args[0], args[1]))
-            {
-                return IoC.Resolve<Hwdtech.ICommand>("DefaultStrategy", args[0], args[1]);
-            }
-
-            return IoC.Resolve<Hwdtech.ICommand>("ExeptionStrategy", args[0], args[1]);
-        }).Execute();
     }
 
     [Fact]
@@ -141,7 +119,7 @@ public class GameCommandTests
         var regcmd = new Mock<Hwdtech.ICommand>();
         regcmd.Setup(c => c.Execute()).Callback(() =>
         {
-            Register_exeption_defualt_handler();
+            new InitDefaultExceptionHandler().Execute();
             IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "TryFindStrategy", (object[] args) =>
             {
                 return (object)((Hwdtech.ICommand)args[0] == cmd1.Object);
