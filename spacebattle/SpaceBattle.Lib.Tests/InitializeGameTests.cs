@@ -81,7 +81,7 @@ public class InitializeGameTests
         Assert.Equal(cmd.Object, strategy.Run());
     }
     [Fact]
-    public void QueuePopStrategy_Test_DissabilityToGetQueueCauseException()
+    public void QueuePopStrategy_Test_DisabilityToGetQueueCauseException()
     {
         var queue = new Mock<IQueue>();
         var cmd = new Mock<ICommand>();
@@ -97,7 +97,7 @@ public class InitializeGameTests
         Assert.Throws<Exception>(() => strategy.Run());
     }
     [Fact]
-    public void QueuePopStrategy_Test_DissabilityToTakeCommandCauseException()
+    public void QueuePopStrategy_Test_DisabilityToTakeCommandCauseException()
     {
         var queue = new Mock<IQueue>();
         queue.Setup(x => x.Take()).Throws(new Exception());
@@ -121,7 +121,7 @@ public class InitializeGameTests
         Assert.Equal(cmd.Object, realqueue.Peek());
     }
     [Fact]
-    public void QueuePushStrategy_Test_DissabilityToGetQueueCauseException()
+    public void QueuePushStrategy_Test_DisabilityToGetQueueCauseException()
     {
         var queue = new Mock<IQueue>();
         var cmd = new Mock<ICommand>();
@@ -139,7 +139,7 @@ public class InitializeGameTests
         Assert.Throws<Exception>(() => { pushCommand.Execute(); });
     }
     [Fact]
-    public void QueuePushStrategy_Test_DissabilityToAddCommandCauseException()
+    public void QueuePushStrategy_Test_DisabilityToAddCommandCauseException()
     {
         var queue = new Mock<IQueue>();
         var cmd = new Mock<ICommand>();
@@ -148,5 +148,115 @@ public class InitializeGameTests
         var pushCommand = new QueuePushCommand(cmd.Object);
 
         Assert.Throws<Exception>(() => { pushCommand.Execute(); });
+    }
+    [Fact]
+    public void DeleteGameCommand_Test_Success()
+    {
+        var gameList = new Mock<IDictionary<string, IInjectable>>();
+        var injectCommand = new Mock<IInjectable>();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.GetGamesList", (object[] args) => gameList.Object).Execute();
+        gameList.SetupGet(x => x[It.IsAny<string>()]).Returns(injectCommand.Object);
+        injectCommand.Setup(x => x.Inject(It.IsAny<ICommand>())).Verifiable();
+        var scopeList = new Mock<IDictionary<string, object>>();
+        scopeList.Setup(x => x.Remove(It.IsAny<string>())).Verifiable();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Scope.List", (object[] args) => scopeList.Object).Execute();
+
+        var command = new DeleteGameCommand("1");
+        command.Execute();
+
+        scopeList.Verify(x => x.Remove(It.IsAny<string>()), Times.Once());
+        injectCommand.Verify(x => x.Inject(It.IsAny<EmptyCommand>()), Times.Once());
+    }
+    [Fact]
+    public void DeleteGameCommand_Test_DisabilityToGetGameListCauseException()
+    {
+        var gameList = new Mock<IDictionary<string, IInjectable>>();
+        var injectCommand = new Mock<IInjectable>();
+        var badcmd = new Mock<Hwdtech.ICommand>();
+        badcmd.Setup(x => x.Execute()).Throws(new Exception());
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.GetGamesList", (object[] args) =>
+        {
+            badcmd.Object.Execute();
+            return gameList.Object;
+        }).Execute();
+
+        gameList.SetupGet(x => x[It.IsAny<string>()]).Returns(injectCommand.Object);
+        injectCommand.Setup(x => x.Inject(It.IsAny<ICommand>())).Verifiable();
+        var scopeList = new Mock<IDictionary<string, object>>();
+        scopeList.Setup(x => x.Remove(It.IsAny<string>())).Verifiable();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Scope.List", (object[] args) => scopeList.Object).Execute();
+
+        var command = new DeleteGameCommand("1");
+
+        Assert.Throws<Exception>(() => { command.Execute(); });
+    }
+    [Fact]
+    public void DeleteGameCommand_Test_DisabilityToGetScopeListCauseException()
+    {
+        var gameList = new Mock<IDictionary<string, IInjectable>>();
+        var injectCommand = new Mock<IInjectable>();
+        var badcmd = new Mock<Hwdtech.ICommand>();
+        badcmd.Setup(x => x.Execute()).Throws(new Exception());
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.GetGamesList", (object[] args) => gameList.Object).Execute();
+
+        gameList.SetupGet(x => x[It.IsAny<string>()]).Returns(injectCommand.Object);
+        injectCommand.Setup(x => x.Inject(It.IsAny<ICommand>())).Verifiable();
+        var scopeList = new Mock<IDictionary<string, object>>();
+        scopeList.Setup(x => x.Remove(It.IsAny<string>())).Verifiable();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Scope.List", (object[] args) =>
+        {
+            badcmd.Object.Execute();
+            return scopeList.Object;
+        }).Execute();
+
+        var command = new DeleteGameCommand("1");
+
+        Assert.Throws<Exception>(() => { command.Execute(); });
+    }
+    [Fact]
+    public void DeleteGameCommand_Test_DisabilityToGetObjectFromGameListCauseException()
+    {
+        var gameList = new Mock<IDictionary<string, IInjectable>>();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.GetGamesList", (object[] args) => gameList.Object).Execute();
+        gameList.SetupGet(x => x[It.IsAny<string>()]).Throws(new Exception());
+        var scopeList = new Mock<IDictionary<string, object>>();
+        scopeList.Setup(x => x.Remove(It.IsAny<string>())).Verifiable();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Scope.List", (object[] args) => scopeList.Object).Execute();
+
+        var command = new DeleteGameCommand("1");
+
+        Assert.Throws<Exception>(() => { command.Execute(); });
+    }
+    [Fact]
+    public void DeleteGameCommand_Test_DisabilityToInjectCommandCauseException()
+    {
+        var gameList = new Mock<IDictionary<string, IInjectable>>();
+        var injectCommand = new Mock<IInjectable>();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.GetGamesList", (object[] args) => gameList.Object).Execute();
+        gameList.SetupGet(x => x[It.IsAny<string>()]).Returns(injectCommand.Object);
+        injectCommand.Setup(x => x.Inject(It.IsAny<ICommand>())).Throws(new Exception());
+        var scopeList = new Mock<IDictionary<string, object>>();
+        scopeList.Setup(x => x.Remove(It.IsAny<string>())).Verifiable();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Scope.List", (object[] args) => scopeList.Object).Execute();
+
+        var command = new DeleteGameCommand("1");
+
+        Assert.Throws<Exception>(() => { command.Execute(); });
+    }
+    [Fact]
+    public void DeleteGameCommand_Test_DisabilityToRemoveScopedCauseException()
+    {
+        var gameList = new Mock<IDictionary<string, IInjectable>>();
+        var injectCommand = new Mock<IInjectable>();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.GetGamesList", (object[] args) => gameList.Object).Execute();
+        gameList.SetupGet(x => x[It.IsAny<string>()]).Returns(injectCommand.Object);
+        injectCommand.Setup(x => x.Inject(It.IsAny<ICommand>())).Verifiable();
+        var scopeList = new Mock<IDictionary<string, object>>();
+        scopeList.Setup(x => x.Remove(It.IsAny<string>())).Throws(new Exception());
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Scope.List", (object[] args) => scopeList.Object).Execute();
+
+        var command = new DeleteGameCommand("1");
+
+        Assert.Throws<Exception>(() => { command.Execute(); });
     }
 }
