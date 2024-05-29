@@ -6,6 +6,6 @@ public class GetObjectStrategy : IStrategy
 {
     public object Run(params object[] args)
     {
-        return IoC.Resolve<IDictionary<int, IUObject>>("Game.UObject.List")[(int)args[0]];
+        return IoC.Resolve<IDictionary<int, IUObject>>("Game.IUObject.List")[(int)args[0]];
     }
 }

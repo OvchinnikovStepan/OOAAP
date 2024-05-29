@@ -11,6 +11,6 @@ public class DeleteObjectCommand : Hwdtech.ICommand
     }
     public void Execute()
     {
-        IoC.Resolve<IDictionary<int, IUObject>>("Game.UObject.List").Remove(objectId);
+        IoC.Resolve<IDictionary<int, IUObject>>("Game.IUObject.List").Remove(objectId);
     }
 }
