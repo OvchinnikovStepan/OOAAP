@@ -70,4 +70,42 @@ public class InitializeGameTests
         }).Execute();
         Assert.Throws<Exception>(() => { new DeleteObjectCommand(1).Execute(); });
     }
+    [Fact]
+    public void QueuePopStrategy_Test_Success()
+    {
+        var queue = new Mock<IQueue>();
+        var cmd = new Mock<ICommand>();
+        queue.Setup(x => x.Take()).Returns(cmd.Object);
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue", (object[] args) => queue.Object).Execute();
+        var strategy = new QueuePopStrategy();
+        Assert.Equal(cmd.Object, strategy.Run());
+    }
+    [Fact]
+    public void QueuePopStrategy_Test_DissabilityToGetQueueCauseException()
+    {
+        var queue = new Mock<IQueue>();
+        var cmd = new Mock<ICommand>();
+        var badcmd = new Mock<Hwdtech.ICommand>();
+        badcmd.Setup(x => x.Execute()).Throws(new Exception());
+        queue.Setup(x => x.Take()).Returns(cmd.Object);
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue", (object[] args) =>
+        {
+            badcmd.Object.Execute();
+            return queue.Object;
+        }).Execute();
+        var strategy = new QueuePopStrategy();
+        Assert.Throws<Exception>(() => strategy.Run());
+    }
+    [Fact]
+    public void QueuePopStrategy_Test_DissabilityToTakeCommandCauseException()
+    {
+        var queue = new Mock<IQueue>();
+        queue.Setup(x => x.Take()).Throws(new Exception());
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue", (object[] args) =>
+        {
+            return queue.Object;
+        }).Execute();
+        var strategy = new QueuePopStrategy();
+        Assert.Throws<Exception>(() => strategy.Run());
+    }
 }

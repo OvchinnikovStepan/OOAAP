@@ -1,9 +1,9 @@
 ﻿namespace SpaceBattle.Lib;
 using Hwdtech;
 
-public class QueuePopStrategy : IStrategy
+public class QueuePopStrategy : ISimpleStrategy
 {
-    public object Run(object[] args)
+    public object Run()
     {
         var queue = IoC.Resolve<IQueue>("Game.Queue");
         return queue.Take();
