@@ -60,6 +60,7 @@ public class RotateCommandTest
         var rotate_Vector = new Rotate_Vector(360, 0);
 
         rotate_Vector.GetHashCode();
+        rotate_Vector.Equals(null);
 
         Assert.True(true);
     }
