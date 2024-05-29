@@ -16,7 +16,7 @@ public class AdapterBulider : IBuilder
         var interface_properties = interface_type.GetProperties().ToList();
 
         var templateString = @"public class {{interface_type_name}}Adapter : {{interface_type_name}} {
-        {{inside_type_name}} _obj;
+        private readonly {{inside_type_name}} obj;
     
         public {{interface_type_name}}Adapter({{inside_type_name}} obj)
         {
@@ -36,8 +36,7 @@ public class AdapterBulider : IBuilder
             return IoC.Resolve<ICommand>(""Game.Set.Property"", ""{{property.name}}"", obj, value).Execute();
         }{{end}}
     }
-    {{end}}
-    }";
+    {{end}}}";
         var template = Template.Parse(templateString);
         var templatedString = template.Render(new
         {
