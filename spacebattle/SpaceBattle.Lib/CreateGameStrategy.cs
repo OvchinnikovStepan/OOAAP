@@ -16,11 +16,11 @@ public class CreateGameStrategy : IStrategy
         var commandsList = new List<Hwdtech.ICommand> { gameCommand };
         var macroCommand = IoC.Resolve<Hwdtech.ICommand>("Game.Command.Macro", commandsList);
         var injectCommand = IoC.Resolve<Hwdtech.ICommand>("Game.Command.Inject", macroCommand);
-        var repeatCommand = IoC.Resolve<Hwdtech.ICommand>("Command.Concurrent.Repeat", injectCommand);
+        var repeatCommand = IoC.Resolve<Hwdtech.ICommand>("Command.Command.Repeat", injectCommand);
         commandsList.Add(repeatCommand);
 
-        var gamesList = IoC.Resolve<IDictionary<string, Hwdtech.ICommand>>("Game.GetGamesList");
-        gamesList.Add(gameId, injectCommand);
+        var gameList = IoC.Resolve<IDictionary<string, Hwdtech.ICommand>>("Game.GetGamesList");
+        gameList.Add(gameId, injectCommand);
 
         return injectCommand;
     }

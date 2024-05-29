@@ -259,4 +259,247 @@ public class InitializeGameTests
 
         Assert.Throws<Exception>(() => { command.Execute(); });
     }
+    [Fact]
+    public void CreateGameStrategy_Test_Success()
+    {
+        var testCommand = new Mock<Hwdtech.ICommand>();
+        testCommand.Setup(x => x.Execute()).Verifiable();
+        var gameCommand = new Mock<Hwdtech.ICommand>();
+        var gameList = new Mock<IDictionary<string, Hwdtech.ICommand>>();
+        gameList.Setup(x => x.Add(It.IsAny<string>(), It.IsAny<Hwdtech.ICommand>())).Verifiable();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Scope.New", (object[] args) =>
+        {
+            testCommand.Object.Execute();
+            return (object)1;
+        }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.New", (object[] args) =>
+         {
+             testCommand.Object.Execute();
+             return (object)1;
+         }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command", (object[] args) =>
+        {
+            testCommand.Object.Execute();
+            return gameCommand.Object;
+        }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.Macro", (object[] args) =>
+        {
+            testCommand.Object.Execute();
+            return gameCommand.Object;
+        }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.Inject", (object[] args) =>
+        {
+            testCommand.Object.Execute();
+            return gameCommand.Object;
+        }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Command.Command.Repeat", (object[] args) =>
+        {
+            testCommand.Object.Execute();
+            return gameCommand.Object;
+        }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.GetGamesList", (object[] args) =>
+       {
+           testCommand.Object.Execute();
+           return gameList.Object;
+       }).Execute();
+
+        var strategy = new CreateGameStrategy();
+        strategy.Run("1", 1, (double)1);
+
+        testCommand.Verify(x => x.Execute(), Times.Exactly(7));
+        gameList.Verify(x => x.Add(It.IsAny<string>(), It.IsAny<Hwdtech.ICommand>()), Times.Once());
+    }
+    [Fact]
+    public void CreateGameStrategy_Test_DisabilityToGetGameListCauseExeption()
+    {
+        var badcmd = new Mock<Hwdtech.ICommand>();
+        badcmd.Setup(x => x.Execute()).Throws(new Exception());
+
+        var gameCommand = new Mock<Hwdtech.ICommand>();
+        var gameList = new Mock<IDictionary<string, Hwdtech.ICommand>>();
+        gameList.Setup(x => x.Add(It.IsAny<string>(), It.IsAny<Hwdtech.ICommand>())).Verifiable();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Scope.New", (object[] args) => (object)1).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.New", (object[] args) => (object)1).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.Macro", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.Inject", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Command.Command.Repeat", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.GetGamesList", (object[] args) =>
+       {
+           badcmd.Object.Execute();
+           return gameList.Object;
+       }).Execute();
+
+        var strategy = new CreateGameStrategy();
+
+        Assert.Throws<Exception>(() => strategy.Run("1", 1, (double)1));
+    }
+    [Fact]
+    public void CreateGameStrategy_Test_DisabilityToAddGameToListCauseExeption()
+    {
+        var gameCommand = new Mock<Hwdtech.ICommand>();
+        var gameList = new Mock<IDictionary<string, Hwdtech.ICommand>>();
+        gameList.Setup(x => x.Add(It.IsAny<string>(), It.IsAny<Hwdtech.ICommand>())).Throws(new Exception());
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Scope.New", (object[] args) => (object)1).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.New", (object[] args) => (object)1).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.Macro", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.Inject", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Command.Command.Repeat", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.GetGamesList", (object[] args) => gameList.Object).Execute();
+
+        var strategy = new CreateGameStrategy();
+
+        Assert.Throws<Exception>(() => strategy.Run("1", 1, (double)1));
+    }
+    [Fact]
+    public void CreateGameStrategy_Test_DisabilityToMakeRepeatCommandCauseExeption()
+    {
+        var badcmd = new Mock<Hwdtech.ICommand>();
+        badcmd.Setup(x => x.Execute()).Throws(new Exception());
+
+        var gameCommand = new Mock<Hwdtech.ICommand>();
+        var gameList = new Mock<IDictionary<string, Hwdtech.ICommand>>();
+        gameList.Setup(x => x.Add(It.IsAny<string>(), It.IsAny<Hwdtech.ICommand>())).Verifiable();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Scope.New", (object[] args) => (object)1).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.New", (object[] args) => (object)1).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.Macro", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.Inject", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Command.Command.Repeat", (object[] args) =>
+        {
+            badcmd.Object.Execute();
+            return gameCommand.Object;
+        }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.GetGamesList", (object[] args) => gameList.Object).Execute();
+
+        var strategy = new CreateGameStrategy();
+
+        Assert.Throws<Exception>(() => strategy.Run("1", 1, (double)1));
+    }
+    [Fact]
+    public void CreateGameStrategy_Test_DisabilityToMakeInjectCommandCauseExeption()
+    {
+        var badcmd = new Mock<Hwdtech.ICommand>();
+        badcmd.Setup(x => x.Execute()).Throws(new Exception());
+
+        var gameCommand = new Mock<Hwdtech.ICommand>();
+        var gameList = new Mock<IDictionary<string, Hwdtech.ICommand>>();
+        gameList.Setup(x => x.Add(It.IsAny<string>(), It.IsAny<Hwdtech.ICommand>())).Verifiable();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Scope.New", (object[] args) => (object)1).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.New", (object[] args) => (object)1).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.Macro", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.Inject", (object[] args) =>
+        {
+            badcmd.Object.Execute();
+            return gameCommand.Object;
+        }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Command.Command.Repeat", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.GetGamesList", (object[] args) => gameList.Object).Execute();
+
+        var strategy = new CreateGameStrategy();
+
+        Assert.Throws<Exception>(() => strategy.Run("1", 1, (double)1));
+    }
+    [Fact]
+    public void CreateGameStrategy_Test_DisabilityToMakeMacroCommandCauseExeption()
+    {
+        var badcmd = new Mock<Hwdtech.ICommand>();
+        badcmd.Setup(x => x.Execute()).Throws(new Exception());
+
+        var gameCommand = new Mock<Hwdtech.ICommand>();
+        var gameList = new Mock<IDictionary<string, Hwdtech.ICommand>>();
+        gameList.Setup(x => x.Add(It.IsAny<string>(), It.IsAny<Hwdtech.ICommand>())).Verifiable();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Scope.New", (object[] args) => (object)1).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.New", (object[] args) => (object)1).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.Macro", (object[] args) =>
+        {
+            badcmd.Object.Execute();
+            return gameCommand.Object;
+        }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.Inject", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Command.Command.Repeat", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.GetGamesList", (object[] args) => gameList.Object).Execute();
+
+        var strategy = new CreateGameStrategy();
+
+        Assert.Throws<Exception>(() => strategy.Run("1", 1, (double)1));
+    }
+    [Fact]
+    public void CreateGameStrategy_Test_DisabilityToMakeGameCommandCauseExeption()
+    {
+        var badcmd = new Mock<Hwdtech.ICommand>();
+        badcmd.Setup(x => x.Execute()).Throws(new Exception());
+
+        var gameCommand = new Mock<Hwdtech.ICommand>();
+        var gameList = new Mock<IDictionary<string, Hwdtech.ICommand>>();
+        gameList.Setup(x => x.Add(It.IsAny<string>(), It.IsAny<Hwdtech.ICommand>())).Verifiable();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Scope.New", (object[] args) => (object)1).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.New", (object[] args) => (object)1).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command", (object[] args) =>
+        {
+            badcmd.Object.Execute();
+            return gameCommand.Object;
+        }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.Macro", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.Inject", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Command.Command.Repeat", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.GetGamesList", (object[] args) => gameList.Object).Execute();
+
+        var strategy = new CreateGameStrategy();
+
+        Assert.Throws<Exception>(() => strategy.Run("1", 1, (double)1));
+    }
+    [Fact]
+    public void CreateGameStrategy_Test_DisabilityToMakeNewQueueCommandCauseExeption()
+    {
+        var badcmd = new Mock<Hwdtech.ICommand>();
+        badcmd.Setup(x => x.Execute()).Throws(new Exception());
+
+        var gameCommand = new Mock<Hwdtech.ICommand>();
+        var gameList = new Mock<IDictionary<string, Hwdtech.ICommand>>();
+        gameList.Setup(x => x.Add(It.IsAny<string>(), It.IsAny<Hwdtech.ICommand>())).Verifiable();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Scope.New", (object[] args) => (object)1).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.New", (object[] args) =>
+        {
+            badcmd.Object.Execute();
+            return (object)1;
+        }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.Macro", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.Inject", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Command.Command.Repeat", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.GetGamesList", (object[] args) => gameList.Object).Execute();
+
+        var strategy = new CreateGameStrategy();
+
+        Assert.Throws<Exception>(() => strategy.Run("1", 1, (double)1));
+    }
+    [Fact]
+    public void CreateGameStrategy_Test_DisabilityToMakeNewScopeCommandCauseExeption()
+    {
+        var badcmd = new Mock<Hwdtech.ICommand>();
+        badcmd.Setup(x => x.Execute()).Throws(new Exception());
+
+        var gameCommand = new Mock<Hwdtech.ICommand>();
+        var gameList = new Mock<IDictionary<string, Hwdtech.ICommand>>();
+        gameList.Setup(x => x.Add(It.IsAny<string>(), It.IsAny<Hwdtech.ICommand>())).Verifiable();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Scope.New", (object[] args) =>
+        {
+            badcmd.Object.Execute();
+            return (object)1;
+        }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.New", (object[] args) => (object)1).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.Macro", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.Inject", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Command.Command.Repeat", (object[] args) => gameCommand.Object).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.GetGamesList", (object[] args) => gameList.Object).Execute();
+
+        var strategy = new CreateGameStrategy();
+
+        Assert.Throws<Exception>(() => strategy.Run("1", 1, (double)1));
+    }
 }
