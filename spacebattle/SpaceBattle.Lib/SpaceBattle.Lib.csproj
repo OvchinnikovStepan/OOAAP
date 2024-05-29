@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Hwdtech.IoC" Version="1.0.0" />
+    <PackageReference Include="Scriban" Version="1.2.1" />
     <PackageReference Include="Hwdtech.Ioc.ScopeBasedIoCImplementation" Version="1.0.0" />
   </ItemGroup>
 
