@@ -502,4 +502,45 @@ public class InitializeGameTests
 
         Assert.Throws<Exception>(() => strategy.Run("1", 1, (double)1));
     }
+    [Fact]
+    public void CreateGameScopeStrategy_Test_Success()
+    {
+        var gameScopeList = new Mock<IDictionary<string, object>>();
+        gameScopeList.Setup(x => x.Add(It.IsAny<string>(), It.IsAny<object>())).Verifiable();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Scope.List", (object[] args) => gameScopeList.Object).Execute();
+
+        var strategy = new NewGameScopeStrategy();
+        strategy.Run("1", IoC.Resolve<object>("Scopes.Current"), (object)1, (double)1);
+
+        gameScopeList.Verify(x => x.Add(It.IsAny<string>(), It.IsAny<object>()), Times.Once());
+    }
+    [Fact]
+    public void CreateGameScopeStrategy_Test_DisabilityToGetScopeListCauseExcepyion()
+    {
+        var badcmd = new Mock<Hwdtech.ICommand>();
+        badcmd.Setup(x => x.Execute()).Throws(new Exception());
+
+        var gameScopeList = new Mock<IDictionary<string, object>>();
+        gameScopeList.Setup(x => x.Add(It.IsAny<string>(), It.IsAny<object>())).Verifiable();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Scope.List", (object[] args) =>
+        {
+            badcmd.Object.Execute();
+            return gameScopeList.Object;
+        }).Execute();
+
+        var strategy = new NewGameScopeStrategy();
+
+        Assert.Throws<Exception>(() => strategy.Run("1", IoC.Resolve<object>("Scopes.Current"), (object)1, (double)1));
+    }
+    [Fact]
+    public void CreateGameScopeStrategy_Test_DisabilityToRegisterScopeCauseException()
+    {
+        var gameScopeList = new Mock<IDictionary<string, object>>();
+        gameScopeList.Setup(x => x.Add(It.IsAny<string>(), It.IsAny<object>())).Throws(new Exception());
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Scope.List", (object[] args) => gameScopeList.Object).Execute();
+
+        var strategy = new NewGameScopeStrategy();
+
+        Assert.Throws<Exception>(() => strategy.Run("1", IoC.Resolve<object>("Scopes.Current"), (object)1, (double)1));
+    }
 }

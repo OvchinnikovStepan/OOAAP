@@ -13,8 +13,10 @@ public class NewGameScopeStrategy : IStrategy
 
         var gameScope = IoC.Resolve<object>("Scopes.New", parentScope);
 
-        var gameScopeMap = IoC.Resolve<IDictionary<string, object>>("Game.Scope.Map");
-        gameScopeMap.Add(gameId, gameScope);
+        var gameScopeList = IoC.Resolve<IDictionary<string, object>>("Game.Scope.List");
+        gameScopeList.Add(gameId, gameScope);
+
+        var currentScope = IoC.Resolve<object>("Scopes.Current");
 
         IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", gameScope).Execute();
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Quant", (object[] args) => (object)quantum).Execute();
@@ -24,7 +26,7 @@ public class NewGameScopeStrategy : IStrategy
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.Push", (object[] args) => { return new QueuePushCommand((ICommand)args[0]); }).Execute();
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.IUObject.Delete", (object[] args) => { return new DeleteObjectCommand((int)args[0]); }).Execute();
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.IUObject.Get", (object[] args) => { return new GetObjectStrategy().Run(args); }).Execute();
-        IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", parentScope).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", currentScope).Execute();
 
         return gameScope;
     }
