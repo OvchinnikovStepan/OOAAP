@@ -13,7 +13,7 @@ public class IncomingCommand : Hwdtech.ICommand
     {
         var obj = IoC.Resolve<IUObject>("Game.IUObject.Get", _message.GameItemID);
         var properties = _message.Properties;
-        properties.ToList().ForEach(property => IoC.Resolve<Hwdtech.ICommand>("Game.IUObject.SetProprty", obj, property.Key, property.Value));
-        IoC.Resolve<Hwdtech.ICommand>("Game.Command." + _message.OrderType, obj).Execute();
+        properties.ToList().ForEach(property => IoC.Resolve<Hwdtech.ICommand>("Game.IUObject.SetProprty", obj, property.Key, property.Value).Execute());
+        IoC.Resolve<ICommand>("Game.Command." + _message.OrderType, obj).Execute();
     }
 }
