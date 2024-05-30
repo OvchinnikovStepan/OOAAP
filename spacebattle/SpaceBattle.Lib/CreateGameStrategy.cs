@@ -9,8 +9,8 @@ public class CreateGameStrategy : IStrategy
         var parentScope = (object)args[1];
         var quant = (double)args[2];
 
-        var gameScope = IoC.Resolve<object>("Game.Scope.New", gameId, parentScope, quant);
         var gameQueue = IoC.Resolve<object>("Game.Queue.New");
+        var gameScope = IoC.Resolve<object>("Game.Scope.New", gameId, parentScope, gameQueue, quant);
         var gameCommand = IoC.Resolve<Hwdtech.ICommand>("Game.Command", gameQueue, gameScope);
 
         var commandsList = new List<Hwdtech.ICommand> { gameCommand };

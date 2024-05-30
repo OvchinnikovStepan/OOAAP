@@ -9,7 +9,7 @@ public class NewGameScopeStrategy : IStrategy
         var gameId = (string)args[0];
         var parentScope = (object)args[1];
         var gameQueue = (object)args[2];
-        var quantum = (double)args[3];
+        var quant = (double)args[3];
 
         var gameScope = IoC.Resolve<object>("Scopes.New", parentScope);
 
@@ -19,7 +19,7 @@ public class NewGameScopeStrategy : IStrategy
         var currentScope = IoC.Resolve<object>("Scopes.Current");
 
         IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", gameScope).Execute();
-        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Quant", (object[] args) => (object)quantum).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Quant", (object[] args) => (object)quant).Execute();
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue", (object[] args) => gameQueue).Execute();
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.IUObject.List", (object[] args) => new Dictionary<int, IUObject>()).Execute();
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.Pop", (object[] args) => { return new QueuePopStrategy().Run(); }).Execute();
