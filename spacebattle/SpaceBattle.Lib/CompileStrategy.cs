@@ -1,26 +1,24 @@
-namespace SpaceBattle.Lib;
+﻿namespace SpaceBattle.Lib;
 using System.Reflection;
+using Hwdtech;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Hwdtech;
 
-public class CompileStrategy : IStrategy  // "Compile"
+public class CompileStrategy : IStrategy
 {
     public object Run(params object[] args)
     {
         var codeString = (string)args[0];
+        var type = (Type)args[1];
 
-        var assemblyName = IoC.Resolve<string>("Assembly.Name.Create");
-        var references = IoC.Resolve<IEnumerable<MetadataReference>>("Compile.References");
-        var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
-        var syntaxTree = CSharpSyntaxTree.ParseText(codeString);
-
-        var compilation = CSharpCompilation.Create(assemblyName).AddReferences(references);
-        compilation = compilation.WithOptions(options).AddSyntaxTrees(syntaxTree);
+        var compilation = CSharpCompilation.Create(type.ToString() + "Adapter")
+            .AddReferences(IoC.Resolve<IEnumerable<MetadataReference>>("Compile.References"))
+            .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+            .AddSyntaxTrees(CSharpSyntaxTree.ParseText(codeString));
 
         Assembly assembly;
 
-        using (var ms = new System.IO.MemoryStream())
+        using (var ms = new MemoryStream())
         {
             var result = compilation.Emit(ms);
             ms.Seek(0, SeekOrigin.Begin);
