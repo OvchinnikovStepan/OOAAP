@@ -1,4 +1,4 @@
-using Hwdtech;
+﻿using Hwdtech;
 using Hwdtech.Ioc;
 namespace SpaceBattle.Lib.Test;
 using Moq;
@@ -72,5 +72,30 @@ public class StartConditionTest
         ((ICommand)new CreateShootCommandStrategy().Run(new object[] { obj })).Execute();
         pushCmd.Verify(x => x.Execute(), Times.Once());
         testCommand.Verify(x => x.Execute(), Times.Exactly(4));
+    }
+    [Fact]
+    public void StartCondition_Test_CreatingStartAndEndCommands()
+    {
+        var testCommand = new Mock<Hwdtech.ICommand>();
+        testCommand.Setup(m => m.Execute()).Verifiable();
+        var obj = new Mock<IUObject>();
+        var iEndable = new Mock<IEndable>();
+        var iStartable = new Mock<IStartCommand>();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.IUObject.Adapter.IEndable", (object[] args) =>
+        {
+            testCommand.Object.Execute();
+            return iEndable.Object;
+        }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.IUObject.Adapter.IStartCommand", (object[] args) =>
+        {
+            testCommand.Object.Execute();
+            return iStartable.Object;
+        }).Execute();
+        var startCommand = new CreateStartMovementCommandStrategy().Run(new object[] { obj });
+        var stopCommand = new CreateEndMovementCommandStrategy().Run(new object[] { obj });
+
+        Assert.Equal(typeof(StartCommand), startCommand.GetType());
+        Assert.Equal(typeof(EndMovementCommand), stopCommand.GetType());
+        testCommand.Verify(x => x.Execute(), Times.Exactly(2));
     }
 }
