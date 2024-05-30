@@ -14,6 +14,6 @@ public class ShootCommand : ICommand
     {
         var bullet = IoC.Resolve<object>("Game.Create.Bullet", shootable);
         var cmd = IoC.Resolve<Hwdtech.ICommand>("Game.Command.Bullet.Act", bullet);
-        IoC.Resolve<Hwdtech.ICommand>("Game.Queue.Push", IoC.Resolve<int>("Game.Get.GameId"), cmd).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("Game.Queue.Push", cmd).Execute();
     }
 }

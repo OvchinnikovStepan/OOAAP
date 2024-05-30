@@ -39,4 +39,38 @@ public class StartConditionTest
         testCommand.Verify(m => m.Execute(), Times.Once());
         iRotatable.Verify(r => r.Position, Times.Once());
     }
+    [Fact]
+    public void StartCondition_Test_ShootingTest()
+    {
+        var strategy = new CreateShootCommandStrategy();
+        var iShootable = new Mock<IShootable>();
+        var testCommand = new Mock<Hwdtech.ICommand>();
+        testCommand.Setup(m => m.Execute()).Verifiable();
+        var pushCmd = new Mock<Hwdtech.ICommand>();
+        var obj = new Mock<IUObject>();
+        pushCmd.Setup(x => x.Execute()).Verifiable();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Create.Bullet", (object[] args) =>
+        {
+            testCommand.Object.Execute();
+            return (object)1;
+        }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Command.Bullet.Act", (object[] args) =>
+        {
+            testCommand.Object.Execute();
+            return pushCmd.Object;
+        }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.IUObject.Adapter.IShootable", (object[] args) =>
+        {
+            testCommand.Object.Execute();
+            return iShootable.Object;
+        }).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Queue.Push", (object[] args) =>
+        {
+            testCommand.Object.Execute();
+            return pushCmd.Object;
+        }).Execute();
+        ((ICommand)new CreateShootCommandStrategy().Run(new object[] { obj })).Execute();
+        pushCmd.Verify(x => x.Execute(), Times.Once());
+        testCommand.Verify(x => x.Execute(), Times.Exactly(4));
+    }
 }
