@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SpaceBattle.Lib\SpaceBattle.Lib.csproj" />
+    <ProjectReference Include="..\CoreWCF\WebHttp.csproj" />
   </ItemGroup>
 
 </Project>
