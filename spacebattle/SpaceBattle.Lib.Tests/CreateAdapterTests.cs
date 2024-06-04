@@ -3,6 +3,7 @@ using Hwdtech;
 using Hwdtech.Ioc;
 namespace SpaceBattle.Lib.Test;
 using Microsoft.CodeAnalysis;
+using Moq;
 
 public class CreatingAdapterTests
 {
@@ -10,10 +11,22 @@ public class CreatingAdapterTests
     {
         new InitScopeBasedIoCImplementationCommand().Execute();
         IoC.Resolve<Hwdtech.ICommand>("Scopes.Current.Set", IoC.Resolve<object>("Scopes.New", IoC.Resolve<object>("Scopes.Root"))).Execute();
+        IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Adapter.Get", (object[] args) =>
+        {
+            var assemblyList = IoC.Resolve<IDictionary<KeyValuePair<Type, Type>, Assembly>>("Game.Adapter.Assembly.List");
+            var pair = new KeyValuePair<Type, Type>((Type)args[0], (Type)args[1]);
+            if (!assemblyList.Keys.Contains(pair))
+            {
+                new CreateAdapterCommand((Type)args[0], (Type)args[1]).Execute();
+            }
+
+            return assemblyList[pair];
+        }).Execute();
     }
     [Fact]
     public void CreateAdapter_Test()
     {
+        var obj = new Mock<IUObject>();
         var metadataReferences = new MetadataReference[]
          {
             MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
@@ -21,11 +34,10 @@ public class CreatingAdapterTests
          };
         var assemblyList = new Dictionary<KeyValuePair<Type, Type>, Assembly>();
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Adapter.Code", (object[] args) =>
-    @"namespace SpaceBattle.Lib{
+    @"namespace SpaceBattle.Lib;
         public class IMovableAdapter : IMovable
         {
-            private IUObject obj;
-            public IMovableAdapter(IUObject obj) => this.obj = obj;
+            public IMovableAdapter() {}
             public Vector Position
             {
                 get => new Vector(new int[] { 0, 1 });
@@ -36,12 +48,16 @@ public class CreatingAdapterTests
                 get => new Vector(new int[] { 0, 1 });
             }
         }
-    }").Execute();
+    ").Execute();
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Compile", (object[] args) => new CompileStrategy().Run(args)).Execute();
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Game.Adapter.Assembly.List", (object[] args) => assemblyList).Execute();
         IoC.Resolve<Hwdtech.ICommand>("IoC.Register", "Compile.References", (object[] args) => metadataReferences).Execute();
-        new CreateAdapterCommand(typeof(IUObject), typeof(IMovable)).Execute();
 
-        Assert.Equal("SpaceBattle.Lib.IMovableAdapter", assemblyList[new KeyValuePair<Type, Type>(typeof(IUObject), typeof(IMovable))].GetName().Name);
+        var assembly = IoC.Resolve<Assembly>("Game.Adapter.Get", typeof(IUObject), typeof(IMovable));
+
+        Assert.Equal("SpaceBattle.Lib.IMovableAdapter", assembly.GetName().Name);
+        assembly.GetType("SpaceBattle.Lib.IMovableAdapter");
+        var o = Activator.CreateInstance(assembly.GetType("SpaceBattle.Lib.IMovableAdapter")!)!;
+        Assert.Equal("SpaceBattle.Lib.IMovableAdapter", o.GetType().ToString());
     }
 }
